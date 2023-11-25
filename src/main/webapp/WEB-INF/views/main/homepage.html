@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Домашняя бухгалтерия</title>
+	<style>
+		.button {
+			display: inline-block;
+			border: 1px solid rgb(0, 0, 0);
+			color: rgb(0, 0, 0);
+			padding: 0 12px;
+			margin: 5px;
+			text-decoration: none;
+			background: #f2f2f2;
+			font-size: 12pt;
+			cursor: pointer;
+		}
+
+		.button:hover {
+			background: #e6e6ff;
+		}
+
+		.pushedButton {
+			display: inline-block;
+			border: 1px solid rgb(0, 0, 0);
+			color: rgb(0, 0, 0);
+			padding: 0 12px;
+			margin: 10px;
+			text-decoration: none;
+			background: rgb(130, 130, 130);
+			font-size: 12pt;
+			cursor: pointer;
+		}
+
+		.category {
+			display: inline-block;
+			border: 1px solid rgb(0, 0, 0);
+			color: rgb(0, 0, 0);
+			padding: 0 12px;
+			margin-left: 50px;
+			margin-top: 5px;
+			text-decoration: none;
+			background: rgb(176, 241, 255);
+			font-size: 12pt;
+			cursor: pointer;
+		}
+
+		.margin {
+			margin-left: 50%;
+		}
+	</style>
+</head>
+
+<body>
+	<form th:method="GET" th:action="@{/operations}" th:object="${filter}">
+		<a th:href="@{/menu}" class="button">Меню</a>
+		<input type="hidden" th:field="*{startDate}">
+		<input type="hidden" th:field="*{endDate}">
+		<input type="hidden" th:field="*{cashAccountID}">
+		<input type="hidden" th:field="*{userID}">
+		<input type="hidden" th:field="*{type}">
+		<input type="submit" value="Показать все операции" class="button">
+	</form>
+	<form th:method="GET" th:action="@{/}" th:object="${viewModel}">
+		<input type="submit" hidden><br>
+		<input type="hidden" th:field="*{userID}">
+		<input type="hidden" th:field="*{cashAccountID}">
+		<div class="margin">
+			Счет:<select th:onchange="window.location = this.value" th:object="${viewModel}" id="account">
+				<option selected disabled th:text="*{cashAccountName}"></option>
+				<option th:value="@{/?startDate=}+*{startDate}+'&endDate='
+			+*{endDate}+'&type='+*{type}+'&userID='+*{userID}">Итого</option>
+				<option th:each="cashAccount : ${cashAccounts}" th:value="@{/?startDate=}+*{startDate}+'&endDate='
+			+*{endDate}+'&type='+*{type}+'&userID='+*{userID}+'&cashAccountID='+${cashAccount.id}"
+					th:text="${cashAccount.name}" />
+			</select>
+		</div>
+		<h2 th:text="'Баланс: '+*{generalBalance}" class="margin">General Balance</h2>
+		<div class="margin">
+			<a th:href="@{/operations/new?type=}+${viewModel.type}" class="button">+</a>
+		</div>
+		<label for="startDate">Начало:</label>
+		<input type="date" th:field="*{startDate}" id="startDate">
+		<label for="endDate">Конец:</label>
+		<input type="date" th:field="*{endDate}" id="endDate">
+		<br>
+	</form>
+	<div th:if="${viewModel.type.equals('income')}" th:object="${viewModel}" class="margin">
+		<a th:href="@{/?}+*{linkParameters}+'&type=outcome'" class="button">Расходы</a>
+		<label class="pushedButton">Доходы</label>
+	</div>
+	<div th:if="${viewModel.type.equals('outcome')}" th:object="${viewModel}" class="margin">
+		<label class="pushedButton">Расходы</label>
+		<a th:href="@{/?}+*{linkParameters}+'&type=income'" class="button">Доходы</a>
+	</div>
+	<p th:each="categoryID : ${viewModel.predentedCategories.keySet()}" th:object="${filter}">
+		<a th:href="@{/operations?}+${viewModel.linkParameters}+'&type='+*{type}+'&categoryID='+${categoryID}"
+			class="category" th:text="${viewModel.predentedCategories.get(categoryID)}"></a>
+	</p>
+
+</body>
+
+
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Редактирование операции</title>
+	<style>
+		.button {
+			display: inline-block;
+			border: 1px solid rgb(0, 0, 0);
+			color: rgb(0, 0, 0);
+			padding: 0 12px;
+			margin: 5px;
+			text-decoration: none;
+			background: #f2f2f2;
+			font-size: 12pt;
+			cursor: pointer;
+		}
+
+		.button:hover {
+			background: #e6e6ff;
+		}
+	</style>
+</head>
+
+<body>
+	<form th:method="PATCH" th:action="@{/operations/{id} (id=${operationID})}" th:object="${operation}">
+	<input type="hidden" th:field="*{type}" th:value="*{type}"/>
+		<h3 th:if="${operation.type.equals('income')}">Доход:</h3>
+		<h3 th:if="${operation.type.equals('outcome')}">Расход:</h3>
+		Сумма: <input type="number" th:field="*{amount}"><br>
+		Счет:<select th:field="*{cashAccountID}">
+				<option  th:each="cashAccount : ${user.cashAccounts}" th:value="${cashAccount.id}"  th:text="${cashAccount.name}">
+				</option>
+			</select>
+			<br>
+		Категория:<select th:field="*{categoryID}">
+				<option th:each="category : ${'income'.equals(operation.type)? user.incomeCategories:user.outcomeCategories}" th:value="${category.id}"  th:text="${category.name}"/>
+			</select>
+			<br>
+		Дата:<input type="date" th:field="*{date}"><br>
+		Комментарий:<input type="text" th:field="*{comment}"><br>
+		<input type="submit" class="button" value="Редактировать">
+	</form>
+	<form th:method="DELETE" th:action="@{/operations/{type}/{id} (type=${operation.type}, id=${operationID})}">
+		<input type="submit" class="button" value="Удалить">
+	</form>
+	<a th:href="@{/}" class="button">Главная страница</a>
+</body>
+
+</html>

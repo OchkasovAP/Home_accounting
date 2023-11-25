@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Редактирование пользователя</title>
+	 <style>
+      .button {
+        display: inline-block;
+			border: 1px solid rgb(0, 0, 0);
+			color: rgb(0, 0, 0);
+			padding: 0 12px;
+			margin: 5px;
+			text-decoration: none;
+			background: #f2f2f2;
+			font-size: 12pt;
+			cursor: pointer;
+      }
+      .button:hover {background: #e6e6ff;}
+    </style>
+</head>
+
+<body>
+	<h1>Редактирование пользователя</h1>
+	<form th:method="PATCH" th:action="@{/users/{id} (id=${userID})}" th:object="${editionUser}">
+		Логин: <input type="text" th:field="*{login}" />
+		<br />
+		Пароль: <input type="text" th:field="*{password}" />
+		<br />
+		<div th:if="${isRoleCorrector}">
+			Роль: <select th:field="*{role.id}">
+				<option th:value="1">Admin</option>
+				<option th:value="2">User</option>
+			</select>
+		</div>
+		<br />
+		<input type="submit" value="Редактировать" class="button"/>
+	</form>
+	<a th:if="${isRoleCorrector}" th:href="@{/users}" class="button">Назад</a>
+	<a th:if="${!isRoleCorrector}" th:href="@{/menu}" class="button">Назад</a>
+</body>
+
+</html>

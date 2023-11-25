@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Меню</title>
+	<style>
+		.button {
+			display: inline-block;
+			border: 1px solid rgb(0, 0, 0);
+			color: rgb(0, 0, 0);
+			padding: 0 12px;
+			margin: 5px;
+			text-decoration: none;
+			background: #f2f2f2;
+			font-size: 12pt;
+			cursor: pointer;
+		}
+
+		.button:hover {
+			background: #e6e6ff;
+		}
+	</style>
+</head>
+
+<body>
+	<h1>Меню</h1>
+	<a th:href="@{/}" class="button">Главная страница</a><br />
+	<a th:href="@{cashAccounts}" class="button">Счета</a><br />
+	<a th:href="@{categories?type=outcome}" class="button">Категории</a><br />
+	<div th:if="${user.isAdmin()}">
+		<a th:href="@{users}" class="button">Пользователи</a><br />
+	</div>
+	<div th:if="${!user.isAdmin()}">
+		<a th:href="@{users/}+${user.getId()}" class="button">Настройки пользователя</a><br />
+	</div>
+	<a th:href="@{/exit}" class="button">Выход</a>
+</body>
+
+</html>

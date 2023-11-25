@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Создать счет</title>
+	<style>
+		.button {
+			display: inline-block;
+			border: 1px solid rgb(0, 0, 0);
+			color: rgb(0, 0, 0);
+			padding: 0 12px;
+			margin: 5px;
+			text-decoration: none;
+			background: #f2f2f2;
+			font-size: 12pt;
+			cursor: pointer;
+		}
+
+		.button:hover {
+			background: #e6e6ff;
+		}
+	</style>
+</head>
+<body>
+	<form th:method="POST" th:action="@{/cashAccounts}" th:object="${cashAccount}">
+		Имя: <input type="text" th:field="*{name}">
+		<br>
+		Баланс: <input type="text" th:field="*{balance}">
+		<br>
+		Учитывать в общем балансе: <input type="radio" th:field="*{containInGenBalance}" id="true" name="inGenBalance" value="true" checked/>
+		<label for="true">Да</label>
+		<input type="radio" th:field="*{containInGenBalance}" id="false" name="inGenBalance" value="false"/>
+		<label for="false">Нет</label>
+		<br>
+		<input type="submit" value="Создать" class="button">
+	</form>
+	<a th:href="@{/cashAccounts}" class="button">Назад</a>
+</body>
+</html>
