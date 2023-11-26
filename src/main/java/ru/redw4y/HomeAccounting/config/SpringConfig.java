@@ -13,7 +13,7 @@ import org.thymeleaf.templatemode.TemplateMode;
 
 @Configuration
 @ComponentScan("ru.redw4y.HomeAccounting")
-//@EnableWebMvc //Импортирует Spring MVC конфигурацию
+@EnableWebMvc //Импортирует Spring MVC конфигурацию
 public class SpringConfig {
 //Создаем applicationContext и с помощью аннотации даем спрингу самому найти подходящий бин
 	@Autowired

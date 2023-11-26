@@ -38,7 +38,6 @@ public class OperationsController {
 	private UserDAO userDAO;
 	@GetMapping()
 	public String showOperationsList(@SessionAttribute("userID") int userID, Model model, @ModelAttribute("filter") OperationsFilter filter) {
-		System.out.println("Filter - "+filter);
 		List<? extends Operation> operations = operationDAO
 				.getUsersOperationsInPeriod(filter);
 		model.addAttribute("filter", filter);

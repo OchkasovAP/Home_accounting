@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +34,8 @@ public class MainController {
 	private OperationsDAO operationsDAO;
 	@Autowired
 	private CashAccountDAO accountDAO;
+	@Autowired
+	private ApplicationContext applicationContext;
 	//TODO
 	@GetMapping()
 	public String mainOperationsView(HttpSession session, Model model,
