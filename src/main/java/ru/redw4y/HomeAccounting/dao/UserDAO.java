@@ -70,5 +70,6 @@ public class UserDAO extends AbstractDAO {
 	public User getUser(int id) {
 		return getItem(id, User.class);
 	}
+	
 
 }
