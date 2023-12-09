@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 import ru.redw4y.HomeAccounting.dao.CashAccountDAO;
 import ru.redw4y.HomeAccounting.dao.OperationsDAO;
 import ru.redw4y.HomeAccounting.dao.UserDAO;
-import ru.redw4y.HomeAccounting.entity.CashAccount;
-import ru.redw4y.HomeAccounting.entity.User;
 import ru.redw4y.HomeAccounting.entityUtil.DateRange;
 import ru.redw4y.HomeAccounting.entityUtil.MainViewModel;
 import ru.redw4y.HomeAccounting.entityUtil.Operation;
 import ru.redw4y.HomeAccounting.entityUtil.OperationModel;
 import ru.redw4y.HomeAccounting.entityUtil.OperationsFilter;
+import ru.redw4y.HomeAccounting.model.CashAccount;
+import ru.redw4y.HomeAccounting.model.User;
 
 @Controller
 public class MainController {
@@ -50,7 +50,7 @@ public class MainController {
 		List<? extends Operation> operations = operationsDAO.getUsersOperationsInPeriod(operationFilter);
 		viewModel.init(operations);
 		if (viewModel.getCashAccountID() != null) {
-			CashAccount cashAccount = accountDAO.getItem(viewModel.getCashAccountID(), CashAccount.class);
+			CashAccount cashAccount = accountDAO.getCashAccount(viewModel.getCashAccountID());
 			viewModel.recalculateGeneralBalance(cashAccount);
 		} else {
 			viewModel.recalculateGeneralBalance(user);

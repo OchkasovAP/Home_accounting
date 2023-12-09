@@ -2,10 +2,10 @@ package ru.redw4y.HomeAccounting.entityUtil;
 
 import java.lang.reflect.InvocationTargetException;
 
-import ru.redw4y.HomeAccounting.entity.Income;
-import ru.redw4y.HomeAccounting.entity.IncomeCategory;
-import ru.redw4y.HomeAccounting.entity.Outcome;
-import ru.redw4y.HomeAccounting.entity.OutcomeCategory;
+import ru.redw4y.HomeAccounting.model.Income;
+import ru.redw4y.HomeAccounting.model.IncomeCategory;
+import ru.redw4y.HomeAccounting.model.Outcome;
+import ru.redw4y.HomeAccounting.model.OutcomeCategory;
 
 public enum OperationType {
 	INCOME(Income.class, IncomeCategory.class), OUTCOME(Outcome.class, OutcomeCategory.class);

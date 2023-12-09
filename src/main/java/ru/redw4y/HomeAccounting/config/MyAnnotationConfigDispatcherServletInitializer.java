@@ -1,5 +1,9 @@
 package ru.redw4y.HomeAccounting.config;
 
+import java.util.EnumSet;
+
+import javax.servlet.DispatcherType;
+import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
@@ -34,16 +38,26 @@ public class MyAnnotationConfigDispatcherServletInitializer extends AbstractAnno
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
 		super.onStartup(servletContext);
-		registerHiddenFieldFilter(servletContext);	
+		 registerCharacterEncodingFilter(servletContext);
+	        registerHiddenFieldFilter(servletContext);
 	}
 	/**
 	 * @param servletContext
 	 */
-	private void registerHiddenFieldFilter(ServletContext servletContext) {
-		CharacterEncodingFilter encodingFilter = new CharacterEncodingFilter("UTF-8", true, true);
-		servletContext.addFilter("encodingFilter", encodingFilter).addMappingForUrlPatterns(null ,true, "/*");
-		servletContext.addFilter("hiddenHttpMethodFilter",
-				new HiddenHttpMethodFilter()).addMappingForUrlPatterns(null ,true, "/*");
-	}
+	private void registerHiddenFieldFilter(ServletContext aContext) {
+        aContext.addFilter("hiddenHttpMethodFilter",
+                new HiddenHttpMethodFilter()).addMappingForUrlPatterns(null, true, "/*");
+    }
+
+    private void registerCharacterEncodingFilter(ServletContext aContext) {
+        EnumSet<DispatcherType> dispatcherTypes = EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD);
+
+        CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
+        characterEncodingFilter.setEncoding("UTF-8");
+        characterEncodingFilter.setForceEncoding(true);
+
+        FilterRegistration.Dynamic characterEncoding = aContext.addFilter("characterEncoding", characterEncodingFilter);
+        characterEncoding.addMappingForUrlPatterns(dispatcherTypes, true, "/*");
+    }
 //---------------------------------------------------------------------------------------------
 }

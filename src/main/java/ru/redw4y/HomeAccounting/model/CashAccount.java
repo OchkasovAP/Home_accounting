@@ -1,7 +1,7 @@
-package ru.redw4y.HomeAccounting.entity;
+package ru.redw4y.HomeAccounting.model;
 
 import java.io.Serializable;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -35,21 +35,8 @@ public class CashAccount implements Serializable, Comparable<CashAccount> {
 
 	private String name;
 
-	@Override
-	public String toString() {
-		return String.format("Имя - %s, баланс - %s, учитывается в общем балансе - %s", name, balance, containInGenBalance?"да":"нет");
-	}
-
 	@ManyToOne
 	private User user;
-
-	// bi-directional many-to-one association to Income
-	@OneToMany(mappedBy = "cashAccount")
-	private List<Income> incomes;
-
-	// bi-directional many-to-one association to Outcome
-	@OneToMany(mappedBy = "cashAccount")
-	private List<Outcome> outcomes;
 
 	public CashAccount() {
 	}
@@ -94,48 +81,10 @@ public class CashAccount implements Serializable, Comparable<CashAccount> {
 		this.name = name;
 	}
 
-	public List<Income> getIncomes() {
-		return this.incomes;
-	}
-
-	public void setIncomes(List<Income> incomes) {
-		this.incomes = incomes;
-	}
-
-	public Income addIncome(Income income) {
-		getIncomes().add(income);
-		income.setCashAccount(this);
-		balance = balance.add(income.getIncome());
-		return income;
-	}
-
-	public Income removeIncome(Income income) {
-		getIncomes().remove(income);
-		income.setCashAccount(null);
-		balance = balance.subtract(income.getIncome());
-		return income;
-	}
-
-	public List<Outcome> getOutcomes() {
-		return this.outcomes;
-	}
-
-	public void setOutcomes(List<Outcome> outcomes) {
-		this.outcomes = outcomes;
-	}
-
-	public Outcome addOutcome(Outcome outcome) {
-		getOutcomes().add(outcome);
-		outcome.setCashAccount(this);
-		balance = balance.subtract(outcome.getOutcome());
-		return outcome;
-	}
-
-	public Outcome removeOutcome(Outcome outcome) {
-		getOutcomes().remove(outcome);
-		outcome.setCashAccount(null);
-		balance = balance.add(outcome.getOutcome());
-		return outcome;
+	
+	@Override
+	public String toString() {
+		return String.format("Имя - %s, баланс - %s, учитывается в общем балансе - %s", name, balance, containInGenBalance?"да":"нет");
 	}
 	@Override
 	public int compareTo(CashAccount o) {

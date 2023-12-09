@@ -7,76 +7,69 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.redw4y.HomeAccounting.entity.CashAccount;
-import ru.redw4y.HomeAccounting.entity.Outcome;
-import ru.redw4y.HomeAccounting.entity.User;
+import org.springframework.transaction.annotation.Transactional;
+
 import ru.redw4y.HomeAccounting.entityUtil.DateRange;
 import ru.redw4y.HomeAccounting.entityUtil.Operation;
 import ru.redw4y.HomeAccounting.entityUtil.OperationModel;
 import ru.redw4y.HomeAccounting.entityUtil.OperationType;
 import ru.redw4y.HomeAccounting.entityUtil.OperationsFilter;
+import ru.redw4y.HomeAccounting.model.CashAccount;
+import ru.redw4y.HomeAccounting.model.Outcome;
+import ru.redw4y.HomeAccounting.model.User;
 import ru.redw4y.HomeAccounting.util.Actioner;
 import ru.redw4y.HomeAccounting.util.DateUtil;
 
 @Component
-public class OperationsDAO extends AbstractDAO {
-
+public class OperationsDAO {
+	@Autowired
+	private SessionFactory sessionFactory;
+	@Transactional
 	public void addOperation(OperationModel operationInfo) {
-		executeTransaction(new Actioner() {
-			@Override
-			public void action() throws Exception {
-				Session session = getCurrentSession();
-				User user = session.find(User.class, operationInfo.getUserID());
-				OperationType type = OperationType.getTypeFromName(operationInfo.getType());
-				Operation operation = type.newEmptyOperation();
-				fillOperationFromModel(operation, operationInfo);
-				user.addOperation(operation);
-			}
-		});
+		Session session = sessionFactory.getCurrentSession();
+		User user = session.find(User.class, operationInfo.getUserID());
+		OperationType type = OperationType.getTypeFromName(operationInfo.getType());
+		Operation operation = type.newEmptyOperation();
+		fillOperationFromModel(operation, operationInfo);
+		user.addOperation(operation);
 	}
-
+	@Transactional
 	public void removeOperation(int userID, int operationID, Class<? extends Operation> operationClass) {
-		executeTransaction(new Actioner() {
-			@Override
-			public void action() throws Exception {
-				Session session = getCurrentSession();
-				User user = session.find(User.class, userID);
-				Operation operation = session.find(operationClass, operationID);
-				user.removeOperation(operation);
-			}
-		});
+		Session session = sessionFactory.getCurrentSession();
+		User user = session.find(User.class, userID);
+		Operation operation = session.find(operationClass, operationID);
+		user.removeOperation(operation);
 	}
-
+	@Transactional
 	public void editOperation(int editOperationID, OperationModel operationInfo) {
-		executeTransaction(new Actioner() {
-			@Override
-			public void action() throws Exception {
-				OperationType operationType = OperationType.getTypeFromName(operationInfo.getType());
-				Operation editOperation = getCurrentSession().find(operationType.getOperationClass(), editOperationID);
-				User user = getCurrentSession().find(User.class, editOperation.getUser().getId());
-				user.removeOperation(editOperation);
-				fillOperationFromModel(editOperation, operationInfo);
-				user.addOperation(editOperation);
-			}
-		});
+		Session session = sessionFactory.getCurrentSession();
+		OperationType operationType = OperationType.getTypeFromName(operationInfo.getType());
+		Operation editOperation = session.find(operationType.getOperationClass(), editOperationID);
+		User user = session.find(User.class, editOperation.getUser().getId());
+		user.removeOperation(editOperation);
+		fillOperationFromModel(editOperation, operationInfo);
+		user.addOperation(editOperation);
 	}
-
+	@Transactional(readOnly = true)
+	public Operation getOperation(int id, Class<? extends Operation> itemClass) {
+		Session session = sessionFactory.getCurrentSession();
+		return session.find(itemClass, id);
+	}
+	@Transactional(readOnly = true)
 	public <T extends Operation> List<T> getUsersOperationsInPeriod(OperationsFilter filter) {
-		Session session = getCurrentSession();
-		Transaction transaction = session.beginTransaction();
+		Session session = sessionFactory.getCurrentSession();
 		User currentUser = session.find(User.class, filter.getUserID());
 		OperationType operationType = OperationType.getTypeFromName(filter.getType());
-		List<T> operations = getFilteredOperations(currentUser.getOperations(operationType),
-				filter);
-		transaction.commit();
+		List<T> operations = getFilteredOperations(currentUser.getOperations(operationType), filter);
 		sortOperationList(operations);
 		return operations;
 	}
 
-	private <T extends Operation> List<T> getFilteredOperations(List<T> allOperations,
-			OperationsFilter filter) {
+	private <T extends Operation> List<T> getFilteredOperations(List<T> allOperations, OperationsFilter filter) {
 		DateRange dateRange = filter.getDateRange();
 		List<T> listInDateInterval = new LinkedList<T>(allOperations);
 		for (Operation operation : allOperations) {
@@ -90,9 +83,9 @@ public class OperationsDAO extends AbstractDAO {
 		}
 		return listInDateInterval;
 	}
-	
-	private void fillOperationFromModel (Operation operation, OperationModel operationModel) {
-		Session session = getCurrentSession();
+
+	private void fillOperationFromModel(Operation operation, OperationModel operationModel) {
+		Session session = sessionFactory.getCurrentSession();
 		Date date = DateUtil.convertStringToDate(operationModel.getDate());
 		operation.setDate(date);
 		operation.setCashAccount(session.find(CashAccount.class, operationModel.getCashAccountID()));
@@ -103,16 +96,14 @@ public class OperationsDAO extends AbstractDAO {
 	}
 
 	private boolean operationIncludeCategory(OperationModel filter, Operation operation) {
-		if (filter.getCategoryID() == null
-				|| filter.getCategoryID().equals(operation.getCategory().getId())) {
+		if (filter.getCategoryID() == null || filter.getCategoryID().equals(operation.getCategory().getId())) {
 			return true;
 		}
 		return false;
 	}
 
 	private boolean operationIncludeCashAccount(OperationModel filter, Operation operation) {
-		if (filter.getCashAccountID() == null
-				|| filter.getCashAccountID().equals(operation.getCashAccount().getId())) {
+		if (filter.getCashAccountID() == null || filter.getCashAccountID().equals(operation.getCashAccount().getId())) {
 			return true;
 		}
 		return false;

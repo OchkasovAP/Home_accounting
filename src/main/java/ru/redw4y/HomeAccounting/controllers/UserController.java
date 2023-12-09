@@ -16,9 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 import ru.redw4y.HomeAccounting.dao.UserDAO;
-
-import ru.redw4y.HomeAccounting.entity.User;
 import ru.redw4y.HomeAccounting.exceptions.UserException;
+import ru.redw4y.HomeAccounting.model.User;
 
 @Controller
 @RequestMapping("/users")

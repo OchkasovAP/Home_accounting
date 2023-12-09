@@ -7,8 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ru.redw4y.HomeAccounting.entity.CashAccount;
-import ru.redw4y.HomeAccounting.entity.User;
+import ru.redw4y.HomeAccounting.model.CashAccount;
+import ru.redw4y.HomeAccounting.model.User;
 import ru.redw4y.HomeAccounting.util.DateUtil;
 
 public class MainViewModel {

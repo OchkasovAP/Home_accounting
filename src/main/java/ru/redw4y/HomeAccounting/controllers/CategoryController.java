@@ -19,10 +19,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 import ru.redw4y.HomeAccounting.dao.CategoriesDAO;
-import ru.redw4y.HomeAccounting.entity.IncomeCategory;
-import ru.redw4y.HomeAccounting.entity.OutcomeCategory;
 import ru.redw4y.HomeAccounting.entityUtil.Category;
 import ru.redw4y.HomeAccounting.entityUtil.OperationType;
+import ru.redw4y.HomeAccounting.model.IncomeCategory;
+import ru.redw4y.HomeAccounting.model.OutcomeCategory;
 
 
 @Controller
@@ -43,7 +43,7 @@ public class CategoryController {
 	@GetMapping("/{id}/{type}")
 	public String getCategoryInfo(@PathVariable("id") int id, @PathVariable("type") String typeName, Model model) {
 			OperationType type = OperationType.getTypeFromName(typeName);
-			model.addAttribute("category", categoriesDAO.getItem(id, type.getCategoryClass()));
+			model.addAttribute("category", categoriesDAO.getCategory(id, type.getCategoryClass()));
 			model.addAttribute("type", typeName.toLowerCase());
 			return "categories/singleInfo";
 	}

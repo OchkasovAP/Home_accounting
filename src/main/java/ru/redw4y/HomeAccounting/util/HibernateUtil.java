@@ -6,28 +6,30 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 
-import ru.redw4y.HomeAccounting.entity.User;
+import ru.redw4y.HomeAccounting.model.User;
 
 @Component
 public class HibernateUtil {
 	private static SessionFactory sessionFactory;
 	static {
-		final StandardServiceRegistry registry = new StandardServiceRegistryBuilder().configure() // configures settings
-																									// from
-																									// hibernate.cfg.xml
-				.build();
+		Configuration config = new Configuration();
+		config.configure();
 		try {
-			sessionFactory = new MetadataSources(registry).buildMetadata().buildSessionFactory();
+			sessionFactory = config.buildSessionFactory();
 			sessionFactory.openSession();
 		} catch (Exception e) {
-			System.out.println("Exception in create SessionFactory------------------------------------");
-			System.out.println(e);
-			StandardServiceRegistryBuilder.destroy(registry);
+			System.err.println("--------------Error in build session factory---------------");
+			System.err.println(e);
+			System.err.println("-----------------------------------------------------------");
+			StandardServiceRegistryBuilder.destroy(config.getStandardServiceRegistryBuilder()
+										.getBootstrapServiceRegistry());
 		}
 	}
 
@@ -39,37 +41,9 @@ public class HibernateUtil {
 		getSessionFactory().close();
 	}
 
-	public Session openSession() {
-		return sessionFactory.openSession();
-	}
-	public Session getCurrentSession() {
+	public static Session getCurrentSession() {
 		Session session = sessionFactory.getCurrentSession();
 		return session;
 	}
 
-	public User findUser(int id) {
-		Session session = openSession();
-		User user = session.find(User.class, id);
-		session.close();
-		return user;
-	}
-
-	public void updateUser(HttpSession session) {
-		Integer userId = ((User) session.getAttribute("user")).getId();
-		session.setAttribute("user", findUser(userId));
-	}
-
-	public void executeTransaction(Session session, Model model, Actioner actioner) {
-		Transaction transaction = session.getTransaction();
-		transaction.begin();
-		try {
-			actioner.action();
-			transaction.commit();
-		} catch (Exception ex) {
-			model.addAttribute("error", ex.getMessage());
-			transaction.rollback();
-		} finally {
-			session.close();
-		}
-	}
 }

@@ -2,18 +2,17 @@ package ru.redw4y.HomeAccounting.dao;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import ru.redw4y.HomeAccounting.util.Actioner;
 import ru.redw4y.HomeAccounting.util.HibernateUtil;
 
+
 public abstract class AbstractDAO {
-	@Autowired
-	private HibernateUtil daoUtil;
 	
 	protected Session getCurrentSession() {
-		return daoUtil.getCurrentSession();
+		return HibernateUtil.getCurrentSession();
 	}
+	
 	public void executeTransaction(Actioner actioner) {
 		Transaction transaction = getCurrentSession().beginTransaction();
 		try {

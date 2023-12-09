@@ -1,7 +1,7 @@
-package ru.redw4y.HomeAccounting.entity;
+package ru.redw4y.HomeAccounting.model;
 
 import java.io.Serializable;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.util.List;
 
 

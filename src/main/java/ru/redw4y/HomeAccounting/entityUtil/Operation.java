@@ -3,8 +3,8 @@ package ru.redw4y.HomeAccounting.entityUtil;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import ru.redw4y.HomeAccounting.entity.CashAccount;
-import ru.redw4y.HomeAccounting.entity.User;
+import ru.redw4y.HomeAccounting.model.CashAccount;
+import ru.redw4y.HomeAccounting.model.User;
 
 public interface Operation {
 

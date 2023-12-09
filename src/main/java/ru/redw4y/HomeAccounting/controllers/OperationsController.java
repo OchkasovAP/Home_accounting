@@ -21,11 +21,11 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 
 import ru.redw4y.HomeAccounting.dao.OperationsDAO;
 import ru.redw4y.HomeAccounting.dao.UserDAO;
-import ru.redw4y.HomeAccounting.entity.User;
 import ru.redw4y.HomeAccounting.entityUtil.Operation;
 import ru.redw4y.HomeAccounting.entityUtil.OperationModel;
 import ru.redw4y.HomeAccounting.entityUtil.OperationType;
 import ru.redw4y.HomeAccounting.entityUtil.OperationsFilter;
+import ru.redw4y.HomeAccounting.model.User;
 import ru.redw4y.HomeAccounting.util.DateUtil;
 
 
@@ -59,7 +59,7 @@ public class OperationsController {
 	public String editOperationForm(@PathVariable("type") String typeName, @PathVariable("id") int operationID,
 			Model model) {
 		OperationType type = OperationType.getTypeFromName(typeName);
-		Operation operation = operationDAO.getItem(operationID, type.getOperationClass());
+		Operation operation = operationDAO.getOperation(operationID, type.getOperationClass());
 		OperationModel operationModel = new OperationModel(operation);
 		model.addAttribute("user", operation.getUser());
 		model.addAttribute("operationID", operationID);

@@ -1,62 +1,56 @@
 package ru.redw4y.HomeAccounting.dao;
 
-import java.util.Collections;
-import java.util.List;
 
+import java.util.List;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-import ru.redw4y.HomeAccounting.entity.CashAccount;
-import ru.redw4y.HomeAccounting.entity.User;
-import ru.redw4y.HomeAccounting.util.Actioner;
+import ru.redw4y.HomeAccounting.model.CashAccount;
+import ru.redw4y.HomeAccounting.model.User;
 
 @Component
-public class CashAccountDAO extends AbstractDAO {
+public class CashAccountDAO {
 	@Autowired
-	private UserDAO userDAO;
+	private SessionFactory sessionFactory;
 
+	@Transactional
 	public void addACashAccout(int userID, CashAccount cashAccount) {
-		executeTransaction(new Actioner() {
-			@Override
-			public void action() throws Exception {
-				User user = getCurrentSession().find(User.class, userID);
-				user.addCashAccount(cashAccount);
-			}
-		});
+		Session session = sessionFactory.getCurrentSession();
+		User user = session.find(User.class, userID);
+		user.addCashAccount(cashAccount);
 	}
 
+	@Transactional
 	public void removeCashAccount(int userID, int cashAccountID) {
-		executeTransaction(new Actioner() {
-			@Override
-			public void action() throws Exception {
-				Session session = getCurrentSession();
-				User user = session.find(User.class, userID);
-				CashAccount cashAccount = session.find(CashAccount.class, cashAccountID);
-				user.removeCashAccount(cashAccount);
-			}
-		});
+		Session session = sessionFactory.getCurrentSession();
+		User user = session.find(User.class, userID);
+		CashAccount cashAccount = session.find(CashAccount.class, cashAccountID);
+		user.removeCashAccount(cashAccount);
 	}
 
+	@Transactional(readOnly = true)
 	public CashAccount getCashAccount(int cashAccID) {
-		return getItem(cashAccID, CashAccount.class);
+		Session session = sessionFactory.getCurrentSession();
+		return session.find(CashAccount.class, cashAccID);
 	}
 
+	@Transactional
 	public void editCashAccount(CashAccount cashAccount) {
-		executeTransaction(new Actioner() {
-			@Override
-			public void action() throws Exception {
-				CashAccount editionAccount = getCurrentSession().find(CashAccount.class, cashAccount.getId());
-				editionAccount.setName(cashAccount.getName());
-				editionAccount.setBalance(cashAccount.getBalance());
-				editionAccount.setContainInGenBalance(cashAccount.getContainInGenBalance());
-			}
-		});
+		Session session = sessionFactory.getCurrentSession();
+		CashAccount editionAccount = session.find(CashAccount.class, cashAccount.getId());
+		editionAccount.setName(cashAccount.getName());
+		editionAccount.setBalance(cashAccount.getBalance());
+		editionAccount.setContainInGenBalance(cashAccount.getContainInGenBalance());
 	}
 
+	@Transactional(readOnly = true)
 	public List<CashAccount> getCashAccounts(int userID) {
-		List<CashAccount> cashAccounts = userDAO.getUser(userID).getCashAccounts();
-		Collections.sort(cashAccounts);
+		Session session = sessionFactory.getCurrentSession();
+		User user = session.find(User.class, userID);
+		List<CashAccount> cashAccounts = user.getCashAccounts().stream().sorted().toList();
 		return cashAccounts;
 	}
 }

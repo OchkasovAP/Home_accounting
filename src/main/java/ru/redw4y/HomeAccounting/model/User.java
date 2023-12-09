@@ -1,20 +1,16 @@
-package ru.redw4y.HomeAccounting.entity;
+package ru.redw4y.HomeAccounting.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import ru.redw4y.HomeAccounting.entityUtil.Category;
 import ru.redw4y.HomeAccounting.entityUtil.Operation;
 import ru.redw4y.HomeAccounting.entityUtil.OperationType;
 import ru.redw4y.HomeAccounting.exceptions.OperationTypeException;
 
-import java.util.ArrayList;
-import java.util.Collections;
 
 import java.util.List;
-
-import org.postgresql.shaded.com.ongres.scram.common.bouncycastle.pbkdf2.RuntimeCryptoException;
 
 /**
  * The persistent class for the users database table.
@@ -27,36 +23,30 @@ public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@SequenceGenerator(name = "user_gen", sequenceName = "users_id_seq", initialValue = 1, allocationSize = 1)
-	@GeneratedValue(generator = "user_gen", strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(generator = "user_gen", strategy = GenerationType.IDENTITY)
 	private Integer id;
 
 	private String login;
 
 	private String password;
 
-	// bi-directional many-to-one association to Income
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private List<Income> incomes;
 
-	// bi-directional many-to-one association to Outcome
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private List<Outcome> outcomes;
 
-	// bi-directional many-to-one association to Outcome
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private List<CashAccount> cashAccounts;
 
-	// bi-directional many-to-one association to Income
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private List<IncomeCategory> incomeCategories;
 
-	// bi-directional many-to-one association to Outcome
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private List<OutcomeCategory> outcomeCategories;
 
-	// bi-directional many-to-one association to Role
 	@ManyToOne
+	@JoinColumn(name = "role_id")
 	private Role role;
 
 	@Override
@@ -96,10 +86,6 @@ public class User implements Serializable {
 		return this.incomes;
 	}
 
-	public void setIncomes(List<Income> incomes) {
-		this.incomes = incomes;
-	}
-
 	public Income addIncome(Income income) {
 		getIncomes().add(income);
 		income.setUser(this);
@@ -122,9 +108,6 @@ public class User implements Serializable {
 		return this.outcomes;
 	}
 
-	public void setOutcomes(List<Outcome> outcomes) {
-		this.outcomes = outcomes;
-	}
 
 	public Outcome addOutcome(Outcome outcome) {
 		getOutcomes().add(outcome);
@@ -148,9 +131,6 @@ public class User implements Serializable {
 		return this.cashAccounts;
 	}
 
-	public void setCashAccounts(List<CashAccount> cashAccounts) {
-		this.cashAccounts = cashAccounts;
-	}
 
 	public CashAccount addCashAccount(CashAccount cashAccount) {
 		getCashAccounts().add(cashAccount);
@@ -203,6 +183,7 @@ public class User implements Serializable {
 		throw new OperationTypeException();
 	}
 	
+	@SuppressWarnings("unchecked")
 	public <T extends Operation> List<T> getOperations(OperationType type) {
 		if (type.equals(OperationType.INCOME)) {
 			return (List<T>) getIncomes();
@@ -261,8 +242,6 @@ public class User implements Serializable {
 		}
 		throw new OperationTypeException();
 	}
-
-	
 
 	public Role getRole() {
 		return this.role;
