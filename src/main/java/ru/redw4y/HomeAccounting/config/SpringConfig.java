@@ -83,8 +83,6 @@ public class SpringConfig {
 		Properties properties = new Properties();
 		properties.put("hibernate.format_sql", environment.getRequiredProperty("hibernate.format_sql"));
 		properties.put("hibernate.show_sql", environment.getRequiredProperty("hibernate.show_sql"));
-//		properties.put("hibernate.current_session_context_class", environment.getRequiredProperty("hibernate.current_session_context_class"));
-//		properties.put("hibernate.hbm2ddl.charset_name", environment.getRequiredProperty("hibernate.hbm2ddl.charset_name"));
 		properties.put("hibernate.dialect", environment.getRequiredProperty("hibernate.dialect"));
 		return properties;
 	}
