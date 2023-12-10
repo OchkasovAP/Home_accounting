@@ -44,7 +44,6 @@ public class MainController {
 			return "redirect:/users/autorization";
 		}
 		int userID = (int)session.getAttribute("userID");
-		User user = userDAO.getUser(userID);
 		viewModel.setUserID(userID);
 		OperationsFilter operationFilter = new OperationsFilter(viewModel);
 		List<? extends Operation> operations = operationsDAO.getUsersOperationsInPeriod(operationFilter);
@@ -53,11 +52,11 @@ public class MainController {
 			CashAccount cashAccount = accountDAO.getCashAccount(viewModel.getCashAccountID());
 			viewModel.recalculateGeneralBalance(cashAccount);
 		} else {
-			viewModel.recalculateGeneralBalance(user);
+			viewModel.recalculateGeneralBalance(accountDAO.getCashAccounts(userID));
 			viewModel.setCashAccountName("Итого");
 		}
 		model.addAttribute("filter", operationFilter);
-		model.addAttribute("cashAccounts", user.getCashAccounts());
+		model.addAttribute("cashAccounts", accountDAO.getCashAccounts(userID));
 		model.addAttribute("viewModel", viewModel);
 		model.addAttribute("operations", operations);
 		return "main/homepage"; 

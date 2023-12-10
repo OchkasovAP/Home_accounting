@@ -50,8 +50,8 @@ public class MainViewModel {
 		generalBalance = cashAccount.getBalance().doubleValue();
 	}
 
-	public void recalculateGeneralBalance(User user) {
-		generalBalance = CashAccount.getGeneralBalance(user.getCashAccounts()).doubleValue();
+	public void recalculateGeneralBalance(List<CashAccount> cashAccounts) {
+		generalBalance = CashAccount.getGeneralBalance(cashAccounts).doubleValue();
 	}
 
 	public DateRange getDateRange() {

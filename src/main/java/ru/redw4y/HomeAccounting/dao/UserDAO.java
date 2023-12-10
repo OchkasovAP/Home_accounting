@@ -13,11 +13,16 @@ import ru.redw4y.HomeAccounting.exceptions.UserException;
 import ru.redw4y.HomeAccounting.model.Role;
 import ru.redw4y.HomeAccounting.model.User;
 
-
 @Component
 public class UserDAO {
-	@Autowired
+
 	private SessionFactory sessionFactory;
+	
+	
+	@Autowired
+	public UserDAO(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}
 
 	@Transactional(readOnly = true)
 	public User checkUser(User user) {
@@ -32,12 +37,14 @@ public class UserDAO {
 		else
 			throw new UserException("Wrong password");
 	}
+
 	@Transactional
 	public void addNewUser(User user) {
 		Session session = sessionFactory.getCurrentSession();
 		user.setRole(session.createQuery("SELECT c FROM Role c WHERE name = 'USER'", Role.class).getSingleResult());
 		session.persist(user);
 	}
+
 	@Transactional
 	public void editUser(int id, User newUser) {
 		Session session = sessionFactory.getCurrentSession();
@@ -46,21 +53,35 @@ public class UserDAO {
 		editableUser.setPassword(newUser.getPassword());
 		editableUser.setRole(newUser.getRole());
 	}
+
 	@Transactional
 	public void deleteUser(int id) {
 		Session session = sessionFactory.getCurrentSession();
 		User user = session.find(User.class, id);
 		session.remove(user);
 	}
+
 	@Transactional(readOnly = true)
 	public List<User> getUserList() {
 		Session session = sessionFactory.getCurrentSession();
 		return session.createQuery("SELECT c FROM User c", User.class).getResultList();
 	}
+
 	@Transactional(readOnly = true)
 	public User getUser(int id) {
 		Session session = sessionFactory.getCurrentSession();
-		return session.find(User.class, id);
+		return session.get(User.class, id);
+	}
+	@Transactional(readOnly = true)
+	public User getFullUser(int id) {
+		Session session = sessionFactory.getCurrentSession();
+		User user = session.find(User.class, id);
+		user.getCashAccounts();
+		user.getIncomeCategories();
+		user.getOutcomeCategories();
+		user.getOutcomes();
+		user.getIncomes();
+		return user;
 	}
 
 }

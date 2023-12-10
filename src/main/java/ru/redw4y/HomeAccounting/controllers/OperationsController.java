@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
+import ru.redw4y.HomeAccounting.dao.CashAccountDAO;
 import ru.redw4y.HomeAccounting.dao.OperationsDAO;
 import ru.redw4y.HomeAccounting.dao.UserDAO;
 import ru.redw4y.HomeAccounting.entityUtil.Operation;
@@ -36,6 +37,7 @@ public class OperationsController {
 	private OperationsDAO operationDAO;
 	@Autowired
 	private UserDAO userDAO;
+	
 	@GetMapping()
 	public String showOperationsList(@SessionAttribute("userID") int userID, Model model, @ModelAttribute("filter") OperationsFilter filter) {
 		List<? extends Operation> operations = operationDAO
@@ -51,7 +53,7 @@ public class OperationsController {
 		operationModel.setDate(DateUtil.convertDateToString(new Date()));
 		operationModel.setType(typeName);
 		model.addAttribute("operation", operationModel);
-		model.addAttribute("user", userDAO.getUser(userID));
+		model.addAttribute("user", userDAO.getFullUser(userID));
 		return "operations/addOperation";
 	}
 
@@ -61,7 +63,8 @@ public class OperationsController {
 		OperationType type = OperationType.getTypeFromName(typeName);
 		Operation operation = operationDAO.getOperation(operationID, type.getOperationClass());
 		OperationModel operationModel = new OperationModel(operation);
-		model.addAttribute("user", operation.getUser());
+		User user = userDAO.getFullUser(operation.getUser().getId());
+		model.addAttribute("user", user);
 		model.addAttribute("operationID", operationID);
 		model.addAttribute("operation", operationModel);
 		return "operations/editOperation";

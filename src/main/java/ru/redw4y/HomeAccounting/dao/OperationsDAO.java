@@ -64,7 +64,7 @@ public class OperationsDAO {
 		Session session = sessionFactory.getCurrentSession();
 		User currentUser = session.find(User.class, filter.getUserID());
 		OperationType operationType = OperationType.getTypeFromName(filter.getType());
-		List<T> operations = getFilteredOperations(currentUser.getOperations(operationType), filter);
+		List<T> operations = (List<T>) getFilteredOperations(currentUser.getOperations(operationType), filter);
 		sortOperationList(operations);
 		return operations;
 	}

@@ -33,6 +33,7 @@
 				<option th:value="2">User</option>
 			</select>
 		</div>
+		<input type="hidden" th:if="${!isRoleCorrector}" th:field="*{role.id}">
 		<br />
 		<input type="submit" value="Редактировать" class="button"/>
 	</form>

@@ -11,7 +11,6 @@ import java.util.List;
  */
 @Entity
 @Table(name="roles")
-@NamedQuery(name="Role.findAll", query="SELECT r FROM Role r")
 public class Role implements Serializable {
 	@Override
 	public String toString() {
@@ -24,7 +23,6 @@ public class Role implements Serializable {
 	private Integer id;
 	private String name;
 
-	//bi-directional many-to-one association to User
 	@OneToMany(mappedBy="role")
 	private List<User> users;
 

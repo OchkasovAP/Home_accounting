@@ -22,9 +22,15 @@ import ru.redw4y.HomeAccounting.model.User;
 @Controller
 @RequestMapping("/users")
 public class UserController {
-	@Autowired
 	private UserDAO userDAO;
 	
+	
+	@Autowired
+	public UserController(UserDAO userDAO) {
+		super();
+		this.userDAO = userDAO;
+	}
+
 	@GetMapping()
 	public String showUsers(@SessionAttribute("userID") Integer userID, Model model) {
 		User currentUser = userDAO.getUser(userID);
@@ -33,7 +39,7 @@ public class UserController {
 			model.addAttribute("userList", userDAO.getUserList());
 			return "users/showUsers";
 		}
-		return "redirect:/users";
+		return "redirect:/";
 	}
 	
 	@GetMapping("/autorization")

@@ -21,7 +21,7 @@
 <body>
 	<div th:each="user : ${userList}">
 		<form th:method="DELETE" th:action="@{users/{id} (id=${user.getId()})}">
-			<label th:text="'Пользователь: Id = '+${user.getId()}+'   login - '+${user.getLogin()}+'   role - '+${user.getRole.getName()}"/>
+			<label th:text="'Пользователь: Id = '+${user.getId()}+'   login - '+${user.getLogin()}+'   role - '+${user.getRole().getName()}"/>
 			<a th:href="@{users/{id} (id=${user.getId()})}" class="button">Редактировать</a>
 			<input th:if="${user.getId()}!=${thisUser.getId()}" type="submit" class="button" th:value="Удалить"/>
 		</form>
