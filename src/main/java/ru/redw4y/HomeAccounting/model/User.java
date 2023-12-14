@@ -3,7 +3,7 @@ package ru.redw4y.HomeAccounting.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import ru.redw4y.HomeAccounting.entityUtil.Category;
 import ru.redw4y.HomeAccounting.entityUtil.Operation;
 import ru.redw4y.HomeAccounting.entityUtil.OperationType;
@@ -21,7 +21,7 @@ import java.util.List;
 public class User implements Serializable {
 
 	@Id
-	@GeneratedValue(generator = "user_gen", strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
 	private String login;

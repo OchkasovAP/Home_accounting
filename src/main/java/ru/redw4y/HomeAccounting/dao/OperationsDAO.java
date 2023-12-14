@@ -8,29 +8,27 @@ import java.util.Comparator;
 import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
 import ru.redw4y.HomeAccounting.entityUtil.DateRange;
 import ru.redw4y.HomeAccounting.entityUtil.Operation;
 import ru.redw4y.HomeAccounting.entityUtil.OperationModel;
 import ru.redw4y.HomeAccounting.entityUtil.OperationType;
 import ru.redw4y.HomeAccounting.entityUtil.OperationsFilter;
 import ru.redw4y.HomeAccounting.model.CashAccount;
-import ru.redw4y.HomeAccounting.model.Outcome;
 import ru.redw4y.HomeAccounting.model.User;
-import ru.redw4y.HomeAccounting.util.Actioner;
 import ru.redw4y.HomeAccounting.util.DateUtil;
 
 @Component
 public class OperationsDAO {
 	@Autowired
-	private SessionFactory sessionFactory;
+	private EntityManager entityManager;
 	@Transactional
 	public void addOperation(OperationModel operationInfo) {
-		Session session = sessionFactory.getCurrentSession();
+		Session session = entityManager.unwrap(Session.class);
 		User user = session.find(User.class, operationInfo.getUserID());
 		OperationType type = OperationType.getTypeFromName(operationInfo.getType());
 		Operation operation = type.newEmptyOperation();
@@ -39,14 +37,14 @@ public class OperationsDAO {
 	}
 	@Transactional
 	public void removeOperation(int userID, int operationID, Class<? extends Operation> operationClass) {
-		Session session = sessionFactory.getCurrentSession();
+		Session session = entityManager.unwrap(Session.class);
 		User user = session.find(User.class, userID);
 		Operation operation = session.find(operationClass, operationID);
 		user.removeOperation(operation);
 	}
 	@Transactional
 	public void editOperation(int editOperationID, OperationModel operationInfo) {
-		Session session = sessionFactory.getCurrentSession();
+		Session session = entityManager.unwrap(Session.class);
 		OperationType operationType = OperationType.getTypeFromName(operationInfo.getType());
 		Operation editOperation = session.find(operationType.getOperationClass(), editOperationID);
 		User user = session.find(User.class, editOperation.getUser().getId());
@@ -56,12 +54,12 @@ public class OperationsDAO {
 	}
 	@Transactional(readOnly = true)
 	public Operation getOperation(int id, Class<? extends Operation> itemClass) {
-		Session session = sessionFactory.getCurrentSession();
+		Session session = entityManager.unwrap(Session.class);
 		return session.find(itemClass, id);
 	}
 	@Transactional(readOnly = true)
 	public <T extends Operation> List<T> getUsersOperationsInPeriod(OperationsFilter filter) {
-		Session session = sessionFactory.getCurrentSession();
+		Session session = entityManager.unwrap(Session.class);
 		User currentUser = session.find(User.class, filter.getUserID());
 		OperationType operationType = OperationType.getTypeFromName(filter.getType());
 		List<T> operations = (List<T>) getFilteredOperations(currentUser.getOperations(operationType), filter);
@@ -85,7 +83,7 @@ public class OperationsDAO {
 	}
 
 	private void fillOperationFromModel(Operation operation, OperationModel operationModel) {
-		Session session = sessionFactory.getCurrentSession();
+		Session session = entityManager.unwrap(Session.class);
 		Date date = DateUtil.convertStringToDate(operationModel.getDate());
 		operation.setDate(date);
 		operation.setCashAccount(session.find(CashAccount.class, operationModel.getCashAccountID()));

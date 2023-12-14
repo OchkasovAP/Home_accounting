@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
 import ru.redw4y.HomeAccounting.exceptions.UserException;
 import ru.redw4y.HomeAccounting.model.CashAccount;
 import ru.redw4y.HomeAccounting.model.Income;
@@ -22,18 +23,12 @@ import ru.redw4y.HomeAccounting.model.User;
 
 @Component
 public class UserDAO {
-
-	private SessionFactory sessionFactory;
-	
-	
 	@Autowired
-	public UserDAO(SessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
-	}
+	private EntityManager entityManager;
 
 	@Transactional(readOnly = true)
 	public User checkUser(User user) {
-		Session session = sessionFactory.getCurrentSession();
+		Session session = entityManager.unwrap(Session.class);
 		Query<User> query = session.createQuery("SELECT c FROM User c WHERE c.login = :login", User.class);
 		query.setParameter("login", user.getLogin());
 		User checkingUser = query.getSingleResult();
@@ -47,14 +42,14 @@ public class UserDAO {
 
 	@Transactional
 	public void addNewUser(User user) {
-		Session session = sessionFactory.getCurrentSession();
+		Session session = entityManager.unwrap(Session.class);
 		user.setRole(session.createQuery("SELECT c FROM Role c WHERE name = 'USER'", Role.class).getSingleResult());
 		session.persist(user);
 	}
 
 	@Transactional
 	public void editUser(int id, User newUser) {
-		Session session = sessionFactory.getCurrentSession();
+		Session session = entityManager.unwrap(Session.class);
 		User editableUser = session.find(User.class, id);
 		editableUser.setLogin(newUser.getLogin());
 		editableUser.setPassword(newUser.getPassword());
@@ -63,25 +58,25 @@ public class UserDAO {
 
 	@Transactional
 	public void deleteUser(int id) {
-		Session session = sessionFactory.getCurrentSession();
+		Session session = entityManager.unwrap(Session.class);
 		User user = session.find(User.class, id);
 		session.remove(user);
 	}
 
 	@Transactional(readOnly = true)
 	public List<User> getUserList() {
-		Session session = sessionFactory.getCurrentSession();
+		Session session = entityManager.unwrap(Session.class);
 		return session.createQuery("SELECT c FROM User c", User.class).getResultList();
 	}
 
 	@Transactional(readOnly = true)
 	public User getUser(int id) {
-		Session session = sessionFactory.getCurrentSession();
+		Session session = entityManager.unwrap(Session.class);
 		return session.get(User.class, id);
 	}
 	@Transactional
 	public User getFullUser(int id) {
-		Session session = sessionFactory.getCurrentSession();
+		Session session = entityManager.unwrap(Session.class);
 		User user = session.find(User.class, id);
 		Hibernate.initialize(user);
 		user.getCashAccounts().isEmpty(); //Почему-то без вызова здесь методов с этими коллекциями, передает юзера с пустыми коллекциями

@@ -1,7 +1,0 @@
-hibernate.connection.url=
-hibernate.connection.username=
-hibernate.connection.password=
-hibernate.driver_class=org.postgresql.Driver
-hibernate.show_sql=true
-hibernate.format_sql=true
-hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
