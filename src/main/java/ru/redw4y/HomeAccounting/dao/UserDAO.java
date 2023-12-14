@@ -1,7 +1,9 @@
 package ru.redw4y.HomeAccounting.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -10,6 +12,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import ru.redw4y.HomeAccounting.exceptions.UserException;
+import ru.redw4y.HomeAccounting.model.CashAccount;
+import ru.redw4y.HomeAccounting.model.Income;
+import ru.redw4y.HomeAccounting.model.IncomeCategory;
+import ru.redw4y.HomeAccounting.model.Outcome;
+import ru.redw4y.HomeAccounting.model.OutcomeCategory;
 import ru.redw4y.HomeAccounting.model.Role;
 import ru.redw4y.HomeAccounting.model.User;
 
@@ -72,15 +79,16 @@ public class UserDAO {
 		Session session = sessionFactory.getCurrentSession();
 		return session.get(User.class, id);
 	}
-	@Transactional(readOnly = true)
+	@Transactional
 	public User getFullUser(int id) {
 		Session session = sessionFactory.getCurrentSession();
 		User user = session.find(User.class, id);
-		user.getCashAccounts();
-		user.getIncomeCategories();
-		user.getOutcomeCategories();
-		user.getOutcomes();
-		user.getIncomes();
+		Hibernate.initialize(user);
+		user.getCashAccounts().isEmpty(); //Почему-то без вызова здесь методов с этими коллекциями, передает юзера с пустыми коллекциями
+		user.getIncomeCategories().isEmpty();
+		user.getOutcomeCategories().isEmpty();
+		user.getIncomes().isEmpty();
+		user.getOutcomes().isEmpty();
 		return user;
 	}
 

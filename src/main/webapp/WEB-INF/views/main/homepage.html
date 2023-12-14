@@ -62,6 +62,7 @@
 		<input type="hidden" th:field="*{type}">
 		<input type="submit" value="Показать все операции" class="button">
 	</form>
+	<hr>
 	<form th:method="GET" th:action="@{/}" th:object="${viewModel}">
 		<input type="submit" hidden><br>
 		<input type="hidden" th:field="*{userID}">
@@ -80,6 +81,7 @@
 		<div class="margin">
 			<a th:href="@{/operations/new?type=}+${viewModel.type}" class="button">+</a>
 		</div>
+		<hr>
 		<label for="startDate">Начало:</label>
 		<input type="date" th:field="*{startDate}" id="startDate">
 		<label for="endDate">Конец:</label>

@@ -83,6 +83,11 @@ public class User implements Serializable {
 	public List<Income> getIncomes() {
 		return this.incomes;
 	}
+	
+
+	public void setIncomes(List<Income> incomes) {
+		this.incomes = incomes;
+	}
 
 	public Income addIncome(Income income) {
 		getIncomes().add(income);
@@ -107,6 +112,10 @@ public class User implements Serializable {
 	}
 
 
+	public void setOutcomes(List<Outcome> outcomes) {
+		this.outcomes = outcomes;
+	}
+
 	public Outcome addOutcome(Outcome outcome) {
 		getOutcomes().add(outcome);
 		outcome.setUser(this);
@@ -129,6 +138,9 @@ public class User implements Serializable {
 		return this.cashAccounts;
 	}
 
+	public void setCashAccounts(List<CashAccount> cashAccounts) {
+		this.cashAccounts = cashAccounts;
+	}
 
 	public CashAccount addCashAccount(CashAccount cashAccount) {
 		getCashAccounts().add(cashAccount);
