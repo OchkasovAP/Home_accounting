@@ -8,6 +8,9 @@ import jakarta.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,8 +26,9 @@ import ru.redw4y.HomeAccounting.entityUtil.MainViewModel;
 import ru.redw4y.HomeAccounting.entityUtil.Operation;
 import ru.redw4y.HomeAccounting.entityUtil.OperationModel;
 import ru.redw4y.HomeAccounting.entityUtil.OperationsFilter;
-import ru.redw4y.HomeAccounting.model.CashAccount;
-import ru.redw4y.HomeAccounting.model.User;
+import ru.redw4y.HomeAccounting.models.CashAccount;
+import ru.redw4y.HomeAccounting.models.User;
+import ru.redw4y.HomeAccounting.security.UserDetailsImpl;
 
 @Controller
 public class MainController {
@@ -34,12 +38,14 @@ public class MainController {
 	private OperationsDAO operationsDAO;
 	@Autowired
 	private CashAccountDAO accountDAO;
-	@Autowired
-	private ApplicationContext applicationContext;
+//	@Autowired
+//	private Authentication authentication;
+	
 	//TODO
 	@GetMapping()
 	public String mainOperationsView(HttpSession session, Model model,
-			@ModelAttribute("viewModel") MainViewModel viewModel) {
+			@ModelAttribute("viewModel") MainViewModel viewModel, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+		System.out.println("UserID - "+userDetails.getUser().getId()+", username - "+userDetails.getUser().getLogin());
 		if (session.getAttribute("userID") == null) {
 			return "redirect:/users/autorization";
 		}

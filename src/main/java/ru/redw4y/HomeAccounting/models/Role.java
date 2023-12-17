@@ -1,4 +1,4 @@
-package ru.redw4y.HomeAccounting.model;
+package ru.redw4y.HomeAccounting.models;
 
 import java.io.Serializable;
 import jakarta.persistence.*;

@@ -18,8 +18,8 @@ import ru.redw4y.HomeAccounting.entityUtil.Operation;
 import ru.redw4y.HomeAccounting.entityUtil.OperationModel;
 import ru.redw4y.HomeAccounting.entityUtil.OperationType;
 import ru.redw4y.HomeAccounting.entityUtil.OperationsFilter;
-import ru.redw4y.HomeAccounting.model.CashAccount;
-import ru.redw4y.HomeAccounting.model.User;
+import ru.redw4y.HomeAccounting.models.CashAccount;
+import ru.redw4y.HomeAccounting.models.User;
 import ru.redw4y.HomeAccounting.util.DateUtil;
 
 @Component

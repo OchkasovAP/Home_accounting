@@ -13,13 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityManager;
 import ru.redw4y.HomeAccounting.exceptions.UserException;
-import ru.redw4y.HomeAccounting.model.CashAccount;
-import ru.redw4y.HomeAccounting.model.Income;
-import ru.redw4y.HomeAccounting.model.IncomeCategory;
-import ru.redw4y.HomeAccounting.model.Outcome;
-import ru.redw4y.HomeAccounting.model.OutcomeCategory;
-import ru.redw4y.HomeAccounting.model.Role;
-import ru.redw4y.HomeAccounting.model.User;
+import ru.redw4y.HomeAccounting.models.CashAccount;
+import ru.redw4y.HomeAccounting.models.Income;
+import ru.redw4y.HomeAccounting.models.IncomeCategory;
+import ru.redw4y.HomeAccounting.models.Outcome;
+import ru.redw4y.HomeAccounting.models.OutcomeCategory;
+import ru.redw4y.HomeAccounting.models.Role;
+import ru.redw4y.HomeAccounting.models.User;
 
 @Component
 public class UserDAO {

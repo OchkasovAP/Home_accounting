@@ -1,14 +1,13 @@
 package ru.redw4y.HomeAccounting.entityUtil;
 
-import java.math.BigDecimal;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ru.redw4y.HomeAccounting.model.CashAccount;
-import ru.redw4y.HomeAccounting.model.User;
+import ru.redw4y.HomeAccounting.models.CashAccount;
 import ru.redw4y.HomeAccounting.util.DateUtil;
 
 public class MainViewModel {

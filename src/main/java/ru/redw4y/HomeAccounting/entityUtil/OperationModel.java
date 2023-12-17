@@ -3,6 +3,7 @@ package ru.redw4y.HomeAccounting.entityUtil;
 import ru.redw4y.HomeAccounting.util.DateUtil;
 
 public class OperationModel {
+	private Integer id;
 	private Integer cashAccountID;
 	private Integer categoryID;
 	private Integer userID;
@@ -13,6 +14,48 @@ public class OperationModel {
 	
 	public OperationModel() {
 		super();
+	}
+	
+	public class Builder{
+		private OperationModel model;
+		public Builder() {
+			model = new OperationModel();
+		}
+		public Builder id(int id) {
+			model.setId(id);
+			return this;
+		}
+		public Builder cashAccountID(int id) {
+			model.setCashAccountID(id);
+			return this;
+		}
+		public Builder categoryID(int id) {
+			model.setCategoryID(id);
+			return this;
+		}
+		public Builder userID(int id) {
+			model.setUserID(id);
+			return this;
+		}
+		public Builder date(String date) {
+			model.setDate(date);
+			return this;
+		}
+		public Builder type(String type) {
+			model.setType(type);
+			return this;
+		}
+		public Builder comment(String comment) {
+			model.setComment(comment);
+			return this;
+		}
+		public Builder amount(Double amount) {
+			model.setAmount(amount);
+			return this;
+		}
+		public OperationModel build() {
+			return model;
+		}
 	}
 	
 	protected OperationModel(MainViewModel viewModel) {
@@ -31,12 +74,20 @@ public class OperationModel {
 		amount = operation.getAmount().doubleValue();
 	}
 
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
 	public Integer getCashAccountID() {
 		return cashAccountID;
 	}
 
-	public void setCashAccountID(Integer cashAccountID) {
-		this.cashAccountID = cashAccountID;
+	public void setCashAccountID(Integer cashAccountId) {
+		this.cashAccountID = cashAccountId;
 	}
 
 	public Integer getCategoryID() {

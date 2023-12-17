@@ -1,4 +1,4 @@
-package ru.redw4y.HomeAccounting.model;
+package ru.redw4y.HomeAccounting.models;
 
 import java.io.Serializable;
 import jakarta.persistence.*;
@@ -15,7 +15,6 @@ import java.util.List;
  */
 @Entity
 @Table(name = "outcome_category")
-@NamedQuery(name = "OutcomeCategory.findAll", query = "SELECT o FROM OutcomeCategory o")
 public class OutcomeCategory implements Serializable, Category {
 	private static final long serialVersionUID = 1L;
 

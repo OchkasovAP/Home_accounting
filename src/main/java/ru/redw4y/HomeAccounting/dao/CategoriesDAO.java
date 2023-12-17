@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityManager;
 import ru.redw4y.HomeAccounting.entityUtil.Category;
 import ru.redw4y.HomeAccounting.entityUtil.OperationType;
-import ru.redw4y.HomeAccounting.model.User;
+import ru.redw4y.HomeAccounting.models.User;
 
 
 @Component

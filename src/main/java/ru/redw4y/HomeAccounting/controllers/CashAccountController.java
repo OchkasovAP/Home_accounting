@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 import ru.redw4y.HomeAccounting.dao.CashAccountDAO;
-import ru.redw4y.HomeAccounting.model.CashAccount;
+import ru.redw4y.HomeAccounting.models.CashAccount;
 
 
 @Controller

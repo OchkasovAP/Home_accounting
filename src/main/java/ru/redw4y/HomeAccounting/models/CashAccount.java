@@ -1,4 +1,4 @@
-package ru.redw4y.HomeAccounting.model;
+package ru.redw4y.HomeAccounting.models;
 
 import java.io.Serializable;
 import jakarta.persistence.*;
@@ -11,7 +11,6 @@ import java.util.List;
  */
 @Entity
 @Table(name = "cash_account")
-@NamedQuery(name = "CashAccount.findAll", query = "SELECT c FROM CashAccount c")
 public class CashAccount implements Serializable, Comparable<CashAccount> {
 	private static final long serialVersionUID = 1L;
 	public static BigDecimal getGeneralBalance(List<CashAccount> cashAccounts) {

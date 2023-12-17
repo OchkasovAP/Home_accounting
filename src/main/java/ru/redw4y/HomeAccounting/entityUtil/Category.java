@@ -2,7 +2,7 @@ package ru.redw4y.HomeAccounting.entityUtil;
 
 import java.util.List;
 
-import ru.redw4y.HomeAccounting.model.User;
+import ru.redw4y.HomeAccounting.models.User;
 
 public interface Category extends Comparable<Category> {
 	void setName(String name);

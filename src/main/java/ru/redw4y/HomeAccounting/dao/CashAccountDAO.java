@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityManager;
-import ru.redw4y.HomeAccounting.model.CashAccount;
-import ru.redw4y.HomeAccounting.model.User;
+import ru.redw4y.HomeAccounting.models.CashAccount;
+import ru.redw4y.HomeAccounting.models.User;
 
 @Component
 public class CashAccountDAO {

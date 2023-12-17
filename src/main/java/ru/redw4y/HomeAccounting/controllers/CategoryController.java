@@ -21,8 +21,8 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 import ru.redw4y.HomeAccounting.dao.CategoriesDAO;
 import ru.redw4y.HomeAccounting.entityUtil.Category;
 import ru.redw4y.HomeAccounting.entityUtil.OperationType;
-import ru.redw4y.HomeAccounting.model.IncomeCategory;
-import ru.redw4y.HomeAccounting.model.OutcomeCategory;
+import ru.redw4y.HomeAccounting.models.IncomeCategory;
+import ru.redw4y.HomeAccounting.models.OutcomeCategory;
 
 
 @Controller

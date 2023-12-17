@@ -1,4 +1,4 @@
-package ru.redw4y.HomeAccounting.model;
+package ru.redw4y.HomeAccounting.models;
 
 import java.io.Serializable;
 import jakarta.persistence.*;
@@ -12,48 +12,41 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 /**
- * The persistent class for the incomes database table.
+ * The persistent class for the outcomes database table.
  * 
  */
 @Entity
-@Table(name = "incomes")
-@NamedQuery(name = "Income.findAll", query = "SELECT i FROM Income i")
-public class Income implements Serializable, Operation {
+@Table(name = "outcomes")
+public class Outcome implements Serializable, Operation {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@SequenceGenerator(name = "income_gen", sequenceName = "incomes_id_seq", initialValue = 1, allocationSize = 1)
-	@GeneratedValue(generator = "income_gen", strategy = GenerationType.SEQUENCE)
+	@SequenceGenerator(name = "outcome_gen", sequenceName = "outcomes_id_seq", initialValue = 1, allocationSize = 1)
+	@GeneratedValue(generator = "outcome_gen", strategy = GenerationType.SEQUENCE)
 	private Integer id;
 
 	private String comment;
 
 	private Date date;
 
-	private BigDecimal income;
+	private BigDecimal outcome;
 
 	// bi-directional many-to-one association to CashAccount
 	@ManyToOne
 	@JoinColumn(name = "cash_account_id")
 	private CashAccount cashAccount;
 
-	// bi-directional many-to-one association to IncomeCategory
+	// bi-directional many-to-one association to OutcomeCategory
 	@ManyToOne
 	@JoinColumn(name = "category_id")
-	private IncomeCategory incomeCategory;
+	private OutcomeCategory outcomeCategory;
 
 	// bi-directional many-to-one association to User
 	@ManyToOne
+	@JoinColumn(name = "user_id")
 	private User user;
 
-	public Income() {
-	}
-
-	public Income(String comment, Date date, BigDecimal income) {
-		super();
-		this.comment = comment;
-		this.date = date;
-		this.income = income;
+	public Outcome() {
 	}
 
 	public Integer getId() {
@@ -80,22 +73,22 @@ public class Income implements Serializable, Operation {
 		this.date = date;
 	}
 
-	public BigDecimal getIncome() {
-		return this.income;
+	public BigDecimal getOutcome() {
+		return this.outcome;
 	}
 
 	@Override
 	public BigDecimal getAmount() {
-		return getIncome();
+		return getOutcome();
 	}
 
-	public void setIncome(BigDecimal income) {
-		this.income = income;
+	public void setOutcome(BigDecimal outcome) {
+		this.outcome = outcome;
 	}
 
 	@Override
 	public void setAmount(BigDecimal amount) {
-		setIncome(amount);
+		setOutcome(amount);
 	}
 
 	public CashAccount getCashAccount() {
@@ -106,23 +99,23 @@ public class Income implements Serializable, Operation {
 		this.cashAccount = cashAccount;
 	}
 
-	public IncomeCategory getIncomeCategory() {
-		return this.incomeCategory;
+	public OutcomeCategory getOutcomeCategory() {
+		return this.outcomeCategory;
 	}
 
 	@Override
 	public Category getCategory() {
-		return getIncomeCategory();
+		return getOutcomeCategory();
 	}
 
-	public void setIncomeCategory(IncomeCategory incomeCategory) {
-		this.incomeCategory = incomeCategory;
+	public void setOutcomeCategory(OutcomeCategory outcomeCategory) {
+		this.outcomeCategory = outcomeCategory;
 	}
 
 	@Override
 	public void setCategory(Category category) {
-		if (category instanceof IncomeCategory) {
-			setIncomeCategory((IncomeCategory) category);
+		if(category instanceof OutcomeCategory) {
+			setOutcomeCategory((OutcomeCategory) category);
 		}
 	}
 
@@ -135,15 +128,16 @@ public class Income implements Serializable, Operation {
 	}
 
 	@Override
-	public String toString() {
-		return "Доход [дата=" + DateUtil.convertDateToString(date) + ", доход = " + income + ", счет: " + cashAccount.getName() + ", категория: "
-				+ incomeCategory.getName() + ", комментарий: "
-						+ comment +"]";
+	public OperationType getType() {
+		return OperationType.OUTCOME;
 	}
 
 	@Override
-	public OperationType getType() {
-		return OperationType.INCOME;
+	public String toString() {
+		return "Расход [дата=" + DateUtil.convertDateToString(date) + ", расход = " + outcome + ", счет: " + cashAccount.getName() + ", категория: "
+				+ outcomeCategory.getName() + ", комментарий: "
+						+ comment +"]";
 	}
+	
 	
 }
