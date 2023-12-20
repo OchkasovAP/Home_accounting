@@ -1,48 +1,70 @@
 package ru.redw4y.HomeAccounting.models;
 
-import java.io.Serializable;
+
 import jakarta.persistence.*;
-import ru.redw4y.HomeAccounting.entityUtil.Category;
-import ru.redw4y.HomeAccounting.entityUtil.Operation;
-import ru.redw4y.HomeAccounting.entityUtil.OperationType;
-import ru.redw4y.HomeAccounting.exceptions.OperationTypeException;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import ru.redw4y.HomeAccounting.util.Category;
+import ru.redw4y.HomeAccounting.util.Operation;
+import ru.redw4y.HomeAccounting.util.OperationType;
 
 import java.util.List;
 
-/**
- * The persistent class for the outcome_category database table.
- * 
- */
+
 @Entity
 @Table(name = "outcome_category")
-public class OutcomeCategory implements Serializable, Category {
-	private static final long serialVersionUID = 1L;
+public class OutcomeCategory implements Category {
+
 
 	@Id
-	@SequenceGenerator(name = "outcome_category_gen", sequenceName = "outcome_category_id_seq", initialValue = 1, allocationSize = 1)
-	@GeneratedValue(generator = "outcome_category_gen", strategy = GenerationType.SEQUENCE)
-	private Integer id;
-
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
+	
+	@NotNull(message = "Поле не должно быть пустым")
+	@Size(min = 1,message = "Поле не должно быть пустым")
 	private String name;
 
 	@ManyToOne
 	private User user;
 
-	// bi-directional many-to-one association to Outcome
-	@OneToMany(mappedBy = "outcomeCategory")
+	@OneToMany(mappedBy = "category")
 	private List<Outcome> outcomes;
 
 	public OutcomeCategory() {
 	}
-
-	@Override
-	public String toString() {
-		return "OutcomeCategory [name=" + name + "]";
-	}
-
-	public OutcomeCategory(String name) {
+	
+	public OutcomeCategory(
+			@NotNull(message = "Поле не должно быть пустым") @Size(min = 1, message = "Поле не должно быть пустым") String name) {
 		super();
 		this.name = name;
+	}
+
+	public static class Builder {
+		private OutcomeCategory category = new OutcomeCategory();
+
+		public OutcomeCategory build() {
+			try{return category;}
+			finally {category = new OutcomeCategory();}
+		}
+
+		public Builder id(Integer id) {
+			category.setId(id);
+			return this;
+		}
+
+		public Builder name(String name) {
+			category.setName(name);
+			return this;
+		}
+
+		public Builder user(User user) {
+			category.setUser(user);
+			return this;
+		}
+		public Builder outcomes(List<Outcome> outcomes) {
+			category.setOutcomes(outcomes);
+			return this;
+		}
 	}
 
 	public Integer getId() {
@@ -72,18 +94,17 @@ public class OutcomeCategory implements Serializable, Category {
 	public List<Outcome> getOutcomes() {
 		return this.outcomes;
 	}
-	public <T extends Operation> List<T> getOperations() {
-		return (List<T>) getOutcomes();
-	}
 
 	public void setOutcomes(List<Outcome> outcomes) {
 		this.outcomes = outcomes;
 	}
-
+	
+	@SuppressWarnings("unchecked")
 	@Override
-	public int compareTo(Category o) {
-		return id - o.getId();
+	public <T extends Operation> List<T> getOperations() {
+		return (List<T>) getOutcomes();
 	}
+
 
 	@Override
 	public OperationType getType() {

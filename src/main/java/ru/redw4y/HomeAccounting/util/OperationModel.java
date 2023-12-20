@@ -1,6 +1,4 @@
-package ru.redw4y.HomeAccounting.entityUtil;
-
-import ru.redw4y.HomeAccounting.util.DateUtil;
+package ru.redw4y.HomeAccounting.util;
 
 public class OperationModel {
 	private Integer id;
@@ -16,7 +14,7 @@ public class OperationModel {
 		super();
 	}
 	
-	public class Builder{
+	public static class Builder{
 		private OperationModel model;
 		public Builder() {
 			model = new OperationModel();
@@ -25,15 +23,15 @@ public class OperationModel {
 			model.setId(id);
 			return this;
 		}
-		public Builder cashAccountID(int id) {
+		public Builder cashAccountID(Integer id) {
 			model.setCashAccountID(id);
 			return this;
 		}
-		public Builder categoryID(int id) {
+		public Builder categoryID(Integer id) {
 			model.setCategoryID(id);
 			return this;
 		}
-		public Builder userID(int id) {
+		public Builder userID(Integer id) {
 			model.setUserID(id);
 			return this;
 		}
@@ -56,12 +54,6 @@ public class OperationModel {
 		public OperationModel build() {
 			return model;
 		}
-	}
-	
-	protected OperationModel(MainViewModel viewModel) {
-		this.cashAccountID = viewModel.getCashAccountID();
-		this.userID = viewModel.getUserID();
-		this.type = viewModel.getType();
 	}
 	
 	public OperationModel(Operation operation) {

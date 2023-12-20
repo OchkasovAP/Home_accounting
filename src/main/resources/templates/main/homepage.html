@@ -55,8 +55,8 @@
 <body>
 	<form th:method="GET" th:action="@{/operations}" th:object="${filter}">
 		<a th:href="@{/menu}" class="button">Меню</a>
-		<input type="hidden" th:field="*{startDate}">
-		<input type="hidden" th:field="*{endDate}">
+		<input type="hidden" name="startDate" th:value="${viewModel.startDate}">
+		<input type="hidden" name="endDate" th:value="${viewModel.endDate}">
 		<input type="hidden" th:field="*{cashAccountID}">
 		<input type="hidden" th:field="*{userID}">
 		<input type="hidden" th:field="*{type}">
@@ -96,8 +96,8 @@
 		<label class="pushedButton">Расходы</label>
 		<a th:href="@{/?}+*{linkParameters}+'&type=income'" class="button">Доходы</a>
 	</div>
-	<p th:each="categoryID : ${viewModel.predentedCategories.keySet()}" th:object="${filter}">
-		<a th:href="@{/operations?}+${viewModel.linkParameters}+'&type='+*{type}+'&categoryID='+${categoryID}"
+	<p th:each="categoryID : ${viewModel.predentedCategories.keySet()}">
+		<a th:href="@{/operations?}+${viewModel.linkParameters}+'&type='+*{viewModel.type}+'&categoryID='+${categoryID}"
 			class="category" th:text="${viewModel.predentedCategories.get(categoryID)}"></a>
 	</p>
 

@@ -1,11 +1,9 @@
-package ru.redw4y.HomeAccounting.entityUtil;
+package ru.redw4y.HomeAccounting.util;
 
 import java.util.Date;
 
 
 import jakarta.servlet.http.HttpServletRequest;
-
-import ru.redw4y.HomeAccounting.util.DateUtil;
 
 public class DateRange {
 	private Date startDate;

@@ -2,8 +2,10 @@ package ru.redw4y.HomeAccounting.security;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +21,12 @@ public class UserDetailsImpl implements UserDetails{
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return Collections.emptyList();
+		return Collections.singletonList(
+				new SimpleGrantedAuthority(
+						new StringBuilder("ROLE_")
+						.append(user.getRole().getName())
+						.toString()
+				));
 	}
 
 	@Override

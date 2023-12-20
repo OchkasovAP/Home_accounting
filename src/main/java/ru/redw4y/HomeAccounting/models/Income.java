@@ -1,65 +1,96 @@
 package ru.redw4y.HomeAccounting.models;
 
-import java.io.Serializable;
+
 import jakarta.persistence.*;
-import ru.redw4y.HomeAccounting.entityUtil.Category;
-import ru.redw4y.HomeAccounting.entityUtil.Operation;
-import ru.redw4y.HomeAccounting.entityUtil.OperationType;
+import ru.redw4y.HomeAccounting.util.Category;
 import ru.redw4y.HomeAccounting.util.DateUtil;
+import ru.redw4y.HomeAccounting.util.Operation;
+import ru.redw4y.HomeAccounting.util.OperationType;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.Date;
 
-/**
- * The persistent class for the incomes database table.
- * 
- */
+
 @Entity
 @Table(name = "incomes")
-public class Income implements Serializable, Operation {
-	private static final long serialVersionUID = 1L;
+public class Income implements Operation {
 
 	@Id
 	@SequenceGenerator(name = "income_gen", sequenceName = "incomes_id_seq", initialValue = 1, allocationSize = 1)
 	@GeneratedValue(generator = "income_gen", strategy = GenerationType.SEQUENCE)
-	private Integer id;
+	private int id;
 
 	private String comment;
 
 	private Date date;
+	
+	@Column(name = "income")
+	private BigDecimal amount;
 
-	private BigDecimal income;
-
-	// bi-directional many-to-one association to CashAccount
 	@ManyToOne
 	@JoinColumn(name = "cash_account_id")
 	private CashAccount cashAccount;
 
-	// bi-directional many-to-one association to IncomeCategoryRepository
 	@ManyToOne
 	@JoinColumn(name = "category_id")
-	private IncomeCategory incomeCategory;
+	private IncomeCategory category;
 
-	// bi-directional many-to-one association to User
 	@ManyToOne
 	private User user;
 
 	public Income() {
 	}
+	
+	public static class Builder {
+		private Income income = new Income();
 
-	public Income(String comment, Date date, BigDecimal income) {
-		super();
-		this.comment = comment;
-		this.date = date;
-		this.income = income;
+		public Income build() {
+			try{return income;}
+			finally {income = new Income();}
+		}
+
+		public Builder id(int id) {
+			income.setId(id);
+			return this;
+		}
+
+		public Builder comment(String comment) {
+			income.setComment(comment);
+			return this;
+		}
+
+		public Builder date(Date date) {
+			income.setDate(date);
+			return this;
+		}
+
+		public Builder amount(BigDecimal amount) {
+			income.setAmount(amount);
+			return this;
+		}
+
+		public Builder cashAccount(CashAccount cashAccount) {
+			income.setCashAccount(cashAccount);
+			return this;
+		}
+
+		public Builder category(IncomeCategory category) {
+			income.setCategory(category);
+			return this;
+		}
+
+		public Builder user(User user) {
+			income.setUser(user);
+			return this;
+		}
+		
 	}
 
-	public Integer getId() {
+	public int getId() {
 		return this.id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
@@ -79,22 +110,12 @@ public class Income implements Serializable, Operation {
 		this.date = date;
 	}
 
-	public BigDecimal getIncome() {
-		return this.income;
-	}
-
-	@Override
 	public BigDecimal getAmount() {
-		return getIncome();
+		return this.amount;
 	}
 
-	public void setIncome(BigDecimal income) {
-		this.income = income;
-	}
-
-	@Override
 	public void setAmount(BigDecimal amount) {
-		setIncome(amount);
+		this.amount = amount;
 	}
 
 	public CashAccount getCashAccount() {
@@ -105,23 +126,18 @@ public class Income implements Serializable, Operation {
 		this.cashAccount = cashAccount;
 	}
 
-	public IncomeCategory getIncomeCategory() {
-		return this.incomeCategory;
-	}
-
-	@Override
 	public Category getCategory() {
-		return getIncomeCategory();
+		return this.category;
 	}
 
-	public void setIncomeCategory(IncomeCategory incomeCategory) {
-		this.incomeCategory = incomeCategory;
+	public void setCategory(IncomeCategory category) {
+		this.category = category;
 	}
 
 	@Override
 	public void setCategory(Category category) {
 		if (category instanceof IncomeCategory) {
-			setIncomeCategory((IncomeCategory) category);
+			setCategory((IncomeCategory) category);
 		}
 	}
 
@@ -135,8 +151,8 @@ public class Income implements Serializable, Operation {
 
 	@Override
 	public String toString() {
-		return "Доход [дата=" + DateUtil.convertDateToString(date) + ", доход = " + income + ", счет: " + cashAccount.getName() + ", категория: "
-				+ incomeCategory.getName() + ", комментарий: "
+		return "Доход [дата=" + DateUtil.convertDateToString(date) + ", доход = " + amount + ", счет: " + cashAccount.getName() + ", категория: "
+				+ category.getName() + ", комментарий: "
 						+ comment +"]";
 	}
 

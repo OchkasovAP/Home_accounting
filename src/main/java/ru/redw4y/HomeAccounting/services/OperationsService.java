@@ -3,19 +3,24 @@ package ru.redw4y.HomeAccounting.services;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityManager;
-import ru.redw4y.HomeAccounting.entityUtil.DateRange;
-import ru.redw4y.HomeAccounting.entityUtil.Operation;
-import ru.redw4y.HomeAccounting.entityUtil.OperationModel;
-import ru.redw4y.HomeAccounting.entityUtil.OperationType;
-import ru.redw4y.HomeAccounting.entityUtil.OperationsFilter;
+import ru.redw4y.HomeAccounting.models.CashAccount;
+import ru.redw4y.HomeAccounting.models.Income;
+import ru.redw4y.HomeAccounting.models.Outcome;
 import ru.redw4y.HomeAccounting.models.User;
 import ru.redw4y.HomeAccounting.repository.CashAccountRepository;
 import ru.redw4y.HomeAccounting.repository.UserRepository;
+import ru.redw4y.HomeAccounting.util.Category;
+import ru.redw4y.HomeAccounting.util.DateRange;
 import ru.redw4y.HomeAccounting.util.DateUtil;
+import ru.redw4y.HomeAccounting.util.Operation;
+import ru.redw4y.HomeAccounting.util.OperationModel;
+import ru.redw4y.HomeAccounting.util.OperationType;
 
 @Service
 @Transactional(readOnly = true)
@@ -33,39 +38,58 @@ public class OperationsService {
 		OperationType type = OperationType.getTypeFromName(model.getType());
 		Operation operation = type.newEmptyOperation();
 		fillOperationFromModel(operation, model);
-		user.addOperation(operation);
+		if(OperationType.INCOME.equals(type)) {
+			addToAccountBalance(operation);
+			user.getIncomes().add((Income)operation);
+		} else if(OperationType.OUTCOME.equals(type)) {
+			substractFromAccountBalance(operation);
+			user.getOutcomes().add((Outcome)operation);
+		}
+		operation.setUser(user);
 	}
+	
 	@Transactional
-	public void delete(int userId, OperationModel model) {
-		User user = userRepository.findById(userId).get();
+	public void delete(OperationModel model) {
 		Class<? extends Operation> operClass = OperationType.getTypeFromName(model.getType()).getOperationClass();
 		Operation operation = entityManager.find(operClass, model.getId());
-		user.removeOperation(operation);
+		User user = operation.getUser();
+		if(OperationType.INCOME.equals(operation.getType())) {
+			substractFromAccountBalance(operation);
+			user.getIncomes().remove(operation);
+		} else if(OperationType.OUTCOME.equals(operation.getType())) {
+			addToAccountBalance(operation);
+			user.getOutcomes().remove(operation);
+		}
+		operation.setUser(null);
 	}
-	//TODO
+
 	@Transactional
-	public void edit(int editOperationID, OperationModel operationModel) {
-		OperationType operationType = OperationType.getTypeFromName(operationModel.getType());
-		Operation editOperation = entityManager.find(operationType.getOperationClass(), editOperationID);
-		User user = userRepository.findById(editOperation.getUser().getId()).get();
-		//TODO Надо как-то перенос средств сделать не заменяя операции
-		user.removeOperation(editOperation);
-		fillOperationFromModel(editOperation, operationModel);
-		user.addOperation(editOperation);
+	public void edit(OperationModel model) {
+		OperationType operationType = OperationType.getTypeFromName(model.getType());
+		Operation editOperation = entityManager.find(operationType.getOperationClass(), model.getId());
+		if(OperationType.INCOME.equals(operationType)) {
+			substractFromAccountBalance(editOperation);
+			fillOperationFromModel(editOperation, model);
+			addToAccountBalance(editOperation);
+		} else if(OperationType.OUTCOME.equals(operationType)) {
+			addToAccountBalance(editOperation);
+			fillOperationFromModel(editOperation, model);
+			substractFromAccountBalance(editOperation);
+		}
 	}
+	
 	@Transactional(readOnly = true)
 	public Operation findById(int id, Class<? extends Operation> itemClass) {
-		return entityManager.find(itemClass, id);
+		return Optional.ofNullable(entityManager.find(itemClass, id)).get();
 	}
+	
 	@Transactional(readOnly = true)
-	public List<Operation> findAllByUserInPeriod(OperationsFilter filter) {
-		User currentUser = userRepository.findById(filter.getUserID()).get();
-		OperationType operationType = OperationType.getTypeFromName(filter.getType());
-		return currentUser.getOperations(operationType)
+	public List<? extends Operation> findAllByUserInPeriod(OperationModel model, DateRange dateRange) {
+		return findAllByUser(model)
 				.stream()
-				.filter(o -> operationInDateInterval(filter, o)
-						&&operationIncludeCategory(filter, o)
-						&&operationIncludeCashAccount(filter, o))
+				.filter(o -> operationInDateInterval(dateRange, o)
+						&&operationIncludeCategory(model, o)
+						&&operationIncludeCashAccount(model, o))
 				.sorted((o1, o2) -> {
 					int dateCompare = o1.getDate().compareTo(o2.getDate());
 					if (dateCompare != 0) {
@@ -75,32 +99,52 @@ public class OperationsService {
 				})
 				.toList();
 	}
-
+	
+	private List<? extends Operation> findAllByUser(OperationModel operation) {
+		OperationType operationType = OperationType.getTypeFromName(operation.getType());
+		User user = userRepository.findById(operation.getUserID()).get();
+		if(OperationType.INCOME.equals(operationType)) {
+			return user.getIncomes(); 
+		} else if(OperationType.OUTCOME.equals(operationType)) {
+			return user.getOutcomes();
+		}
+		throw new IllegalArgumentException("Non correct operation type");
+	}
+	private void substractFromAccountBalance(Operation operation) {
+		CashAccount account = operation.getCashAccount();
+		BigDecimal accountBalance = account.getBalance();
+		account.setBalance(accountBalance.subtract(operation.getAmount()));
+	}
+	private void addToAccountBalance(Operation operation) {
+		CashAccount cashAccount = operation.getCashAccount();
+		BigDecimal accountBalance = cashAccount.getBalance();
+		cashAccount.setBalance(accountBalance.add(operation.getAmount()));
+	}
 	private void fillOperationFromModel(Operation operation, OperationModel model) {
 		Date date = DateUtil.convertStringToDate(model.getDate());
 		operation.setDate(date);
 		operation.setCashAccount(accountRepository.findById(model.getCashAccountID()).get());
 		OperationType type = operation.getType();
-		operation.setCategory(entityManager.find(type.getCategoryClass(), model.getCategoryID()));
+		Optional<Category> category = Optional.ofNullable(entityManager.find(type.getCategoryClass(), model.getCategoryID()));
+		operation.setCategory(category.get());
 		operation.setAmount(new BigDecimal(model.getAmount()));
 		operation.setComment(model.getComment());
 	}
 	
-	private boolean operationInDateInterval(OperationsFilter filter, Operation operation) {
-		DateRange dateRange = filter.getDateRange();
+	private boolean operationInDateInterval(DateRange dateRange, Operation operation) {
 		Date operationDate = operation.getDate();
 		return operationDate.compareTo(dateRange.getStartDate()) >= 0
 				&& operationDate.compareTo(dateRange.getEndDate()) <= 0;
 	}
-	private boolean operationIncludeCategory(OperationModel filter, Operation operation) {
-		if (filter.getCategoryID() == null || filter.getCategoryID().equals(operation.getCategory().getId())) {
+	private boolean operationIncludeCategory(OperationModel operationModel, Operation operation) {
+		if (operationModel.getCategoryID() == null || operationModel.getCategoryID().equals(operation.getCategory().getId())) {
 			return true;
 		}
 		return false;
 	}
 
-	private boolean operationIncludeCashAccount(OperationModel filter, Operation operation) {
-		if (filter.getCashAccountID() == null || filter.getCashAccountID().equals(operation.getCashAccount().getId())) {
+	private boolean operationIncludeCashAccount(OperationModel operationModel, Operation operation) {
+		if (operationModel.getCashAccountID() == null || operationModel.getCashAccountID().equals(operation.getCashAccount().getId())) {
 			return true;
 		}
 		return false;

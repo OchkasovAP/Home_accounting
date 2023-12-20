@@ -1,19 +1,20 @@
-package ru.redw4y.HomeAccounting.entityUtil;
+package ru.redw4y.HomeAccounting.util;
 
 import java.util.List;
 
 import ru.redw4y.HomeAccounting.models.User;
 
-public interface Category extends Comparable<Category> {
+public interface Category {
+	String getName();
 	void setName(String name);
-
+	
+	User getUser();
 	void setUser(User user);
 
 	Integer getId();
-
-	String getName();
+	void setId(Integer id);
 
 	OperationType getType();
-
 	<T extends Operation> List<T> getOperations();
+	
 }

@@ -34,7 +34,10 @@
 	<div th:if="${!user.isAdmin()}">
 		<a th:href="@{users/}+${user.getId()}" class="button">Настройки пользователя</a><br />
 	</div>
-	<a th:href="@{/exit}" class="button">Выход</a>
+	<form method="POST" action="/logout">
+		<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+		<input type="submit" class="button" value="Выход"/>
+	</form>
 </body>
 
 </html>

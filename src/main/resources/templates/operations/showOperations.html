@@ -25,7 +25,7 @@
 </head>
 
 <body>
-	<div th:text="${filter.getDateRange()}"></div>
+	<div th:text="${dateRange}"></div>
 	<div th:each="operation : ${operations}">
 		<a th:href="@{/operations/}+${operation.getType().name().toLowerCase()}+'/'+${operation.getId()}"
 		th:text="${operation}" class="button"></a>

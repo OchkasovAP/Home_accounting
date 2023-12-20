@@ -1,43 +1,67 @@
 package ru.redw4y.HomeAccounting.models;
 
-import java.io.Serializable;
-import jakarta.persistence.*;
-import java.math.BigDecimal;
-import java.util.List;
 
-/**
- * The persistent class for the cash_account database table.
- * 
- */
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "cash_account")
-public class CashAccount implements Serializable, Comparable<CashAccount> {
-	private static final long serialVersionUID = 1L;
-	public static BigDecimal getGeneralBalance(List<CashAccount> cashAccounts) {
-		BigDecimal generalBalance = new BigDecimal(0);
-		for (CashAccount cashAccount : cashAccounts) {
-			if (cashAccount.getContainInGenBalance()) {
-				generalBalance = generalBalance.add(cashAccount.getBalance());
-			}
-		}
-		return generalBalance;
-	}
+public class CashAccount {
+	
 	@Id
-	@SequenceGenerator(name = "cash_account_gen", sequenceName = "cash_account_id_seq", initialValue = 1, allocationSize = 1)
-	@GeneratedValue(generator = "cash_account_gen", strategy = GenerationType.SEQUENCE)
-	private Integer id;
-
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
+	
+	@NotNull
 	private BigDecimal balance;
 
 	@Column(name = "contain_in_gen_balance")
-	private Boolean containInGenBalance;
-
+	private boolean containInGenBalance;
+	
+	@NotNull(message = "Поле не должно быть пустым")
+	@Size(min = 1,message = "Поле не должно быть пустым")
 	private String name;
 
 	@ManyToOne
 	private User user;
 
 	public CashAccount() {
+	}
+	
+ 	public static class Builder {
+		private CashAccount cashAccount = new CashAccount();
+
+		public CashAccount build() {
+			try{return cashAccount;}
+			finally {cashAccount = new CashAccount();}
+		}
+
+		public Builder id(Integer id) {
+			cashAccount.setId(id);
+			return this;
+		}
+
+		public Builder balance(BigDecimal balance) {
+			cashAccount.setBalance(balance);
+			return this;
+		}
+
+		public Builder containInGenBalance(Boolean containInGenBalance) {
+			cashAccount.setContainInGenBalance(containInGenBalance);
+			return this;
+		}
+
+		public Builder name(String name) {
+			cashAccount.setName(name);
+			return this;
+		}
+
+		public Builder user(User user) {
+			cashAccount.setUser(user);
+			return this;
+		}
 	}
 
 	public Integer getId() {
@@ -79,14 +103,10 @@ public class CashAccount implements Serializable, Comparable<CashAccount> {
 	public void setName(String name) {
 		this.name = name;
 	}
-
 	
 	@Override
 	public String toString() {
 		return String.format("Имя - %s, баланс - %s, учитывается в общем балансе - %s", name, balance, containInGenBalance?"да":"нет");
 	}
-	@Override
-	public int compareTo(CashAccount o) {
-		return id-o.getId();
-	}
+	
 }

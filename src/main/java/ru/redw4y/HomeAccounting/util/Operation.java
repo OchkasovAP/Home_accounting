@@ -1,4 +1,4 @@
-package ru.redw4y.HomeAccounting.entityUtil;
+package ru.redw4y.HomeAccounting.util;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -8,33 +8,27 @@ import ru.redw4y.HomeAccounting.models.User;
 
 public interface Operation {
 
-	Date getDate();
-
-	Integer getId();
+	int getId();
+	void setId(int id);
 
 	CashAccount getCashAccount();
-
-	BigDecimal getAmount();
-
-	Category getCategory();
-
-	OperationType getType();
-
-	String getComment();
-	
-	User getUser();
-
 	void setCashAccount(CashAccount cashAccount);
-
-	void setComment(String comment);
-
-
-	void setCategory(Category category);
-
-	void setUser(User user);
-
+	
+	Date getDate();
 	void setDate(Date date);
 
+	BigDecimal getAmount();
 	void setAmount(BigDecimal amount);
+
+	Category getCategory();
+	void setCategory(Category category);
+
+	User getUser();
+	void setUser(User user);
+
+	String getComment();
+	void setComment(String comment);
+	
+	OperationType getType();	
 
 }

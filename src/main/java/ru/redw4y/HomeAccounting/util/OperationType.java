@@ -1,4 +1,4 @@
-package ru.redw4y.HomeAccounting.entityUtil;
+package ru.redw4y.HomeAccounting.util;
 
 import java.lang.reflect.InvocationTargetException;
 

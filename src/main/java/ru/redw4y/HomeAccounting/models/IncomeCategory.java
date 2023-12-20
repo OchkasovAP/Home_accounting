@@ -1,50 +1,68 @@
 package ru.redw4y.HomeAccounting.models;
 
-import java.io.Serializable;
 import jakarta.persistence.*;
-import ru.redw4y.HomeAccounting.entityUtil.Category;
-import ru.redw4y.HomeAccounting.entityUtil.Operation;
-import ru.redw4y.HomeAccounting.entityUtil.OperationType;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import ru.redw4y.HomeAccounting.util.Category;
+import ru.redw4y.HomeAccounting.util.Operation;
+import ru.redw4y.HomeAccounting.util.OperationType;
 
-import java.util.ArrayList;
 import java.util.List;
 
-
-/**
- * The persistent class for the income_category database table.
- * 
- */
 @Entity
 @Table(name="income_category")
-public class IncomeCategory implements Serializable, Category {
-	private static final long serialVersionUID = 1L;
-	
-
-	public IncomeCategory(String name) {
-		super();
-		this.name = name;
-	}
-
-	@Override
-	public String toString() {
-		return "IncomeCategoryRepository [name=" + name + "]";
-	}
+public class IncomeCategory implements Category {
 
 	@Id
-	@SequenceGenerator(name = "income_category_gen", sequenceName = "income_category_id_seq", initialValue = 1, allocationSize = 1)
-	@GeneratedValue(generator = "income_category_gen", strategy =GenerationType.SEQUENCE )
-	private Integer id;
-
+	@GeneratedValue(strategy =GenerationType.IDENTITY )
+	private int id;
+	
+	@NotNull(message = "Поле не должно быть пустым")
+	@Size(min = 1,message = "Поле не должно быть пустым")
 	private String name;
 	
 	@ManyToOne
 	private User user;
 
-	//bi-directional many-to-one association to Income
-	@OneToMany(mappedBy="incomeCategory")
+	@OneToMany(mappedBy="category")
 	private List<Income> incomes;
 
 	public IncomeCategory() {
+	}
+	
+	public IncomeCategory(
+			@NotNull(message = "Поле не должно быть пустым") @Size(min = 1, message = "Поле не должно быть пустым") String name) {
+		super();
+		this.name = name;
+	}
+
+
+	public static class Builder {
+		private IncomeCategory category = new IncomeCategory();
+
+		public IncomeCategory build() {
+			try{return category;}
+			finally {category = new IncomeCategory();}
+		}
+
+		public Builder id(Integer id) {
+			category.setId(id);
+			return this;
+		}
+
+		public Builder name(String name) {
+			category.setName(name);
+			return this;
+		}
+
+		public Builder user(User user) {
+			category.setUser(user);
+			return this;
+		}
+		public Builder incomes(List<Income> incomes) {
+			category.setIncomes(incomes);
+			return this;
+		}
 	}
 
 	public Integer getId() {
@@ -75,32 +93,15 @@ public class IncomeCategory implements Serializable, Category {
 	public List<Income> getIncomes() {
 		return this.incomes;
 	}
-	
-	public <T extends Operation> List<T> getOperations() {
-		return (List<T>) getIncomes();
-	}
 
 	public void setIncomes(List<Income> incomes) {
 		this.incomes = incomes;
 	}
-
-	public Income addIncome(Income income) {
-		getIncomes().add(income);
-		income.setIncomeCategory(this);
-
-		return income;
-	}
-
-	public Income removeIncome(Income income) {
-		getIncomes().remove(income);
-		income.setIncomeCategory(null);
-
-		return income;
-	}
-
+	
+	@SuppressWarnings("unchecked")
 	@Override
-	public int compareTo(Category o) {
-		return id-o.getId();
+	public <T extends Operation> List<T> getOperations() {
+		return (List<T>) getIncomes();
 	}
 	
 	@Override

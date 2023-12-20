@@ -1,26 +1,17 @@
 package ru.redw4y.HomeAccounting.models;
 
-import java.io.Serializable;
 import jakarta.persistence.*;
 import java.util.List;
 
 
-/**
- * The persistent class for the roles database table.
- * 
- */
 @Entity
 @Table(name="roles")
-public class Role implements Serializable {
-	@Override
-	public String toString() {
-		return "Role [name=" + name + "]";
-	}
-
-	private static final long serialVersionUID = 1L;
-
+public class Role {
+	public static final String ADMIN = "ADMIN";
+	public static final String USER = "USER";
+	
 	@Id
-	private Integer id;
+	private int id;
 	private String name;
 
 	@OneToMany(mappedBy="role")
@@ -28,12 +19,18 @@ public class Role implements Serializable {
 
 	public Role() {
 	}
+	
+	public Role(Integer id, String name) {
+		super();
+		this.id = id;
+		this.name = name;
+	}
 
-	public Integer getId() {
+	public int getId() {
 		return this.id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
@@ -41,8 +38,8 @@ public class Role implements Serializable {
 		return this.name;
 	}
 
-	public void setName(Roles role) {
-		this.name = role.toString();
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public List<User> getUsers() {
@@ -53,20 +50,4 @@ public class Role implements Serializable {
 		this.users = users;
 	}
 
-	public User addUser(User user) {
-		getUsers().add(user);
-		user.setRole(this);
-
-		return user;
-	}
-
-	public User removeUser(User user) {
-		getUsers().remove(user);
-		user.setRole(null);
-		return user;
-	}
-
-}
-enum Roles {
-	ADMIN, USER
 }
