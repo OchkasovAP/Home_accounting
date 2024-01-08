@@ -1,4 +1,4 @@
-package ru.redw4y.HomeAccounting.util;
+package ru.redw4y.HomeAccounting.dto;
 
 
 import java.util.Calendar;
@@ -6,8 +6,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import ru.redw4y.HomeAccounting.util.DateUtil;
 
-public class MainViewModel {
+
+public class MainViewDTO {
 	private double amountInPeriod = 0;
 	private double generalBalance = 0;
 	private String startDate;
@@ -19,7 +21,7 @@ public class MainViewModel {
 	private String linkParameters;
 	private Map<Integer, String> predentedCategories = new HashMap<>();
 
-	public MainViewModel() {
+	public MainViewDTO() {
 		super();
 		Calendar today = Calendar.getInstance();
 		long dayOfTheWeek = today.get(Calendar.DAY_OF_WEEK);

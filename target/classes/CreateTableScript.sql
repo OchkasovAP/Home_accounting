@@ -28,29 +28,32 @@ INSERT INTO users (login, password, role_id) VALUES ('admin', 'admin', 1);
 CREATE TABLE income_category
 (
     id SERIAL PRIMARY KEY,
-    name character varying(20) NOT NULL CHECK(LENGHT(name)>0),
+    name character varying(20) NOT NULL,
     user_id INT NOT NULL,
     CONSTRAINT UNIQ_IC_NAME_AND_USER UNIQUE (name, user_id),
+    CONSTRAINT NAME_MIN_SIZE CHECK(LENGTH(name)>0),
     FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE -- Внешний ключ из таблицы пользователей   
 );
 --Cоздаем таблицу категорий расходов
 CREATE TABLE outcome_category
 (
     id SERIAL PRIMARY KEY,
-    name character varying(20) NOT NULL CHECK(LENGHT(name)>0),
+    name character varying(20) NOT NULL,
     user_id INT NOT NULL,
     CONSTRAINT UNIQ_OC_NAME_AND_USER UNIQUE (name, user_id),
+    CONSTRAINT NAME_MIN_SIZE CHECK(LENGTH(name)>0),
     FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE -- Внешний ключ из таблицы пользователей    
 );
 --Создаем таблицу счетов
 CREATE TABLE cash_account
 (
     id SERIAL PRIMARY KEY,
-    name character varying(20) NOT NULL CHECK(LENGHT(name)>0), 
+    name character varying(20) NOT NULL, 
     balance decimal(12,2) NOT NULL,
     contain_in_gen_balance boolean NOT NULL,
     user_id INT NOT NULL,
     CONSTRAINT UNIQ_CA_NAME_AND_USER UNIQUE (name, user_id),
+    CONSTRAINT NAME_MIN_SIZE CHECK(LENGTH(name)>0),
     FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE -- Внешний ключ из таблицы пользователей
 );
 --Создаем таблицу расходов

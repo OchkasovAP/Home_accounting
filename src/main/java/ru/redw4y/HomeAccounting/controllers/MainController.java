@@ -7,9 +7,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import ru.redw4y.HomeAccounting.dto.MainViewDTO;
 import ru.redw4y.HomeAccounting.security.UserDetailsImpl;
 import ru.redw4y.HomeAccounting.services.MainService;
-import ru.redw4y.HomeAccounting.util.MainViewModel;
 
 
 @Controller
@@ -19,7 +19,7 @@ public class MainController {
 	
 	@GetMapping()
 	public String mainOperationsView(Model model,
-			@ModelAttribute("viewModel") MainViewModel viewModel, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+			@ModelAttribute("viewModel") MainViewDTO viewModel, @AuthenticationPrincipal UserDetailsImpl userDetails) {
 		model.addAllAttributes(mainService.mainPageAttributes(viewModel, userDetails.getUser()));
 		return "main/homepage"; 
 	}

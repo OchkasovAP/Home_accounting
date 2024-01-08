@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import ru.redw4y.HomeAccounting.dto.PasswordDTO;
 import ru.redw4y.HomeAccounting.models.User;
 import ru.redw4y.HomeAccounting.security.UserDetailsImpl;
 import ru.redw4y.HomeAccounting.services.UserService;
-import ru.redw4y.HomeAccounting.util.PasswordModel;
 import ru.redw4y.HomeAccounting.util.PasswordValidator;
 import ru.redw4y.HomeAccounting.util.UserValidator;
 
@@ -48,13 +48,13 @@ public class UserController {
 	}
 
 	@GetMapping("/registration")
-	public String createForm(@ModelAttribute("user") User user, @ModelAttribute("password") PasswordModel password) {
+	public String createForm(@ModelAttribute("user") User user, @ModelAttribute("password") PasswordDTO password) {
 		return "users/registration";
 	}
 
 	@GetMapping("/{id}")
 	public String editForm(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable("id") int id, @ModelAttribute("user") User user,
-			Model model,@ModelAttribute("password") PasswordModel password) {
+			Model model,@ModelAttribute("password") PasswordDTO password) {
 		User principal = userDetails.getUser();
 		model.addAttribute("user", userService.findById(id));
 		model.addAttribute("isRoleCorrector", principal.isAdmin() && principal.getId()!= id);
@@ -63,13 +63,12 @@ public class UserController {
 	
 	@PostMapping("/registration")
 	public String create(@ModelAttribute("user") @Valid User user, BindingResult userBindingResult,
-			@ModelAttribute("password") @Valid PasswordModel password, BindingResult passBindingResult) {
+			@ModelAttribute("password") @Valid PasswordDTO password, BindingResult passBindingResult) {
 		userValidator.validate(user, userBindingResult);
 		passwordValidator.validate(password, passBindingResult);
-//		if(userBindingResult.hasErrors()||passBindingResult.hasErrors()) {
-//			return "/users/registration";
-//			
-//		}
+		if(userBindingResult.hasErrors()||passBindingResult.hasErrors()) {
+			return "/users/registration";			
+		}
 		userService.create(user, password);
 		return "redirect:/users/autorization";
 	}
@@ -78,7 +77,7 @@ public class UserController {
 	public String edit(@AuthenticationPrincipal UserDetailsImpl userDetails,
 			@ModelAttribute("isRoleCorrector") String isRoleCorrector,
 			@ModelAttribute("user") @Valid User user, BindingResult userBindingResult,
-			@ModelAttribute("password") @Valid PasswordModel password,BindingResult passBindingResult) {
+			@ModelAttribute("password") @Valid PasswordDTO password,BindingResult passBindingResult) {
 		passwordValidator.validate(password, passBindingResult);
 		userValidator.validate(user, userBindingResult);
 		boolean passHasErrors = !(password.getWritten()==null||"".equals(password.getWritten()))

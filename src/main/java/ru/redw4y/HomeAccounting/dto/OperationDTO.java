@@ -1,6 +1,9 @@
-package ru.redw4y.HomeAccounting.util;
+package ru.redw4y.HomeAccounting.dto;
 
-public class OperationModel {
+import ru.redw4y.HomeAccounting.util.DateUtil;
+import ru.redw4y.HomeAccounting.util.Operation;
+
+public class OperationDTO {
 	private Integer id;
 	private Integer cashAccountID;
 	private Integer categoryID;
@@ -10,14 +13,14 @@ public class OperationModel {
 	private String comment;
 	private Double amount;
 	
-	public OperationModel() {
+	public OperationDTO() {
 		super();
 	}
 	
 	public static class Builder{
-		private OperationModel model;
+		private OperationDTO model;
 		public Builder() {
-			model = new OperationModel();
+			model = new OperationDTO();
 		}
 		public Builder id(int id) {
 			model.setId(id);
@@ -51,12 +54,12 @@ public class OperationModel {
 			model.setAmount(amount);
 			return this;
 		}
-		public OperationModel build() {
+		public OperationDTO build() {
 			return model;
 		}
 	}
 	
-	public OperationModel(Operation operation) {
+	public OperationDTO(Operation operation) {
 		userID = operation.getUser().getId();
 		categoryID = operation.getCategory().getId();
 		cashAccountID = operation.getCashAccount().getId();
@@ -132,7 +135,7 @@ public class OperationModel {
 
 	@Override
 	public String toString() {
-		return "OperationModel [cashAccountID=" + cashAccountID + ", categoryID=" + categoryID + ", userID=" + userID
+		return "OperationDTO [cashAccountID=" + cashAccountID + ", categoryID=" + categoryID + ", userID=" + userID
 				+ ", date=" + date + ", type=" + type + ", comment=" + comment + ", amount=" + amount + "]";
 	}
 	

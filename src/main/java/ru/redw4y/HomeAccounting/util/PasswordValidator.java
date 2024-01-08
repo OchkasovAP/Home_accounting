@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
+import ru.redw4y.HomeAccounting.dto.PasswordDTO;
+
 @Component
 public class PasswordValidator implements Validator {
 	@Autowired
@@ -13,12 +15,12 @@ public class PasswordValidator implements Validator {
 
 	@Override
 	public boolean supports(Class<?> clazz) {
-		return PasswordModel.class.equals(clazz);
+		return PasswordDTO.class.equals(clazz);
 	}
 
 	@Override
 	public void validate(Object target, Errors errors) {
-		PasswordModel password = (PasswordModel) target;
+		PasswordDTO password = (PasswordDTO) target;
 		if (!password.getUpdated().equals(password.getRepeated())) {
 			errors.rejectValue("updated", null, "Неверно повторен пароль");
 		}

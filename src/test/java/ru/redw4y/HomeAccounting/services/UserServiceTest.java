@@ -21,11 +21,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import ru.redw4y.HomeAccounting.dto.PasswordDTO;
 import ru.redw4y.HomeAccounting.models.Role;
 import ru.redw4y.HomeAccounting.models.User;
 import ru.redw4y.HomeAccounting.repository.RoleRepository;
 import ru.redw4y.HomeAccounting.repository.UserRepository;
-import ru.redw4y.HomeAccounting.util.PasswordModel;
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 	@InjectMocks
@@ -66,7 +66,7 @@ class UserServiceTest {
 			.id(2)
 			.login("User2")
 			.build();
-		PasswordModel password = new PasswordModel.Builder().updated("password2").build();
+		PasswordDTO password = new PasswordDTO.Builder().updated("password2").build();
 		when(userRepository.save(user)).thenAnswer(a -> {
 			users.add(user);
 			return user;
@@ -83,7 +83,7 @@ class UserServiceTest {
 	void edit_CurrentLoginAndUpdatePassword() {
 		User user = users.get(1);
 		User editUser = new User.Builder().login(user.getLogin()).id(user.getId()).build();
-		PasswordModel password = new PasswordModel.Builder().current("password1").updated("newpassword1").build();
+		PasswordDTO password = new PasswordDTO.Builder().current("password1").updated("newpassword1").build();
 		when(encoder.encode(password.getUpdated())).thenReturn(nonMockEncoder.encode(password.getUpdated()));
 		when(userRepository.findById(1)).thenReturn(Optional.of(users.get(1)));
 		when(userRepository.save(user)).thenReturn(user);
@@ -95,7 +95,7 @@ class UserServiceTest {
 	void edit_UpdateLoginAndCurrentPassword() {
 		User user = users.get(1);
 		User editUser = new User.Builder().login("NewUserLogin").id(user.getId()).build();
-		PasswordModel password = new PasswordModel.Builder().build();
+		PasswordDTO password = new PasswordDTO.Builder().build();
 		when(userRepository.findById(1)).thenReturn(Optional.of(users.get(1)));
 		when(userRepository.save(user)).thenReturn(user);
 		service.edit(editUser, password);

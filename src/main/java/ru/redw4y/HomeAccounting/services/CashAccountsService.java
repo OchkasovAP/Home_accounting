@@ -16,7 +16,6 @@ import ru.redw4y.HomeAccounting.repository.CashAccountRepository;
 import ru.redw4y.HomeAccounting.repository.UserRepository;
 
 @Service
-@Transactional(readOnly = true)
 public class CashAccountsService {
 	@Autowired
 	private UserRepository userRepository;
@@ -33,6 +32,7 @@ public class CashAccountsService {
 		return generalBalance;
 	}
 	
+	@Transactional(readOnly = true)
 	public List<CashAccount> findAllByUser(int userId) {
 		Optional<User> user = userRepository.findById(userId);
 		if(user.isEmpty()) {
@@ -40,7 +40,7 @@ public class CashAccountsService {
 		}
 		return user.get().getCashAccounts().stream().sorted(Comparator.comparing(a -> a.getId())).toList();
 	}
-	
+	@Transactional(readOnly = true)
 	public CashAccount findById(int id) {
 		return accountRepository.findById(id).get();
 	}

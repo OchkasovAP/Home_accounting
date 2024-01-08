@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import ru.redw4y.HomeAccounting.dto.OperationDTO;
 import ru.redw4y.HomeAccounting.models.User;
 import ru.redw4y.HomeAccounting.security.UserDetailsImpl;
 import ru.redw4y.HomeAccounting.services.OperationsService;
@@ -24,7 +25,6 @@ import ru.redw4y.HomeAccounting.services.UserService;
 import ru.redw4y.HomeAccounting.util.DateRange;
 import ru.redw4y.HomeAccounting.util.DateUtil;
 import ru.redw4y.HomeAccounting.util.Operation;
-import ru.redw4y.HomeAccounting.util.OperationModel;
 import ru.redw4y.HomeAccounting.util.OperationType;
 
 
@@ -37,7 +37,7 @@ public class OperationsController {
 	private UserService userService;
 	
 	@GetMapping()
-	public String showOperationsList(Model model, @ModelAttribute("filter") OperationModel filter,
+	public String showOperationsList(Model model, @ModelAttribute("filter") OperationDTO filter,
 			@ModelAttribute("startDate") String startDate, @ModelAttribute("endDate") String endDate) {
 		DateRange dateRange = new DateRange(startDate, endDate);
 		List<? extends Operation> operations = operationsService.findAllByUserInPeriod(filter, dateRange);
@@ -48,10 +48,10 @@ public class OperationsController {
 
 	@GetMapping("/new")
 	public String addOperation(@AuthenticationPrincipal UserDetailsImpl userDetails, @ModelAttribute("type") String typeName, Model model) {
-		OperationModel operationModel = new OperationModel();
-		operationModel.setDate(DateUtil.convertDateToString(new Date()));
-		operationModel.setType(typeName);
-		model.addAttribute("operation", operationModel);
+		OperationDTO operationDTO = new OperationDTO();
+		operationDTO.setDate(DateUtil.convertDateToString(new Date()));
+		operationDTO.setType(typeName);
+		model.addAttribute("operation", operationDTO);
 		model.addAttribute("user", userService.getFullUser(userDetails.getUser().getId()));
 		return "operations/addOperation";
 	}
@@ -61,25 +61,25 @@ public class OperationsController {
 			Model model) {
 		OperationType type = OperationType.getTypeFromName(typeName);
 		Operation operation = operationsService.findById(operationID, type.getOperationClass());
-		OperationModel operationModel = new OperationModel(operation);
+		OperationDTO operationDTO = new OperationDTO(operation);
 		User user = userService.getFullUser(operation.getUser().getId());
 		model.addAttribute("user", user);
 		model.addAttribute("operationID", operationID);
-		model.addAttribute("operation", operationModel);
+		model.addAttribute("operation", operationDTO);
 		return "operations/editOperation";
 	}
 	@PostMapping()
-	public String postOperation(@ModelAttribute("operation") OperationModel operationModel,
+	public String postOperation(@ModelAttribute("operation") OperationDTO operationDTO,
 			@AuthenticationPrincipal UserDetailsImpl userDetails) {
-		operationModel.setUserID(userDetails.getUser().getId());
-		operationsService.create(operationModel);
+		operationDTO.setUserID(userDetails.getUser().getId());
+		operationsService.create(operationDTO);
 		return "redirect:/";
 	}
 
 	@PatchMapping("/{id}")
-	public String editOperation(@ModelAttribute("operation") OperationModel operationModel,
+	public String editOperation(@ModelAttribute("operation") OperationDTO operationDTO,
 			 @PathVariable("id") int operationID) {
-		operationsService.edit(operationModel);
+		operationsService.edit(operationDTO);
 		return "redirect:/";
 	}
 
@@ -87,7 +87,7 @@ public class OperationsController {
 	public String deleteOperation(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable("id") int operationID,
 			@PathVariable("type") String typeName) {
 		int userID = userDetails.getUser().getId();
-		operationsService.delete(new OperationModel.Builder().id(operationID).userID(userID).type(typeName).build());
+		operationsService.delete(new OperationDTO.Builder().id(operationID).userID(userID).type(typeName).build());
 		return "redirect:/";
 	}
 

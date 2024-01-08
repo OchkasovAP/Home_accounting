@@ -18,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import jakarta.persistence.EntityManager;
+import ru.redw4y.HomeAccounting.dto.OperationDTO;
 import ru.redw4y.HomeAccounting.models.CashAccount;
 import ru.redw4y.HomeAccounting.models.Income;
 import ru.redw4y.HomeAccounting.models.IncomeCategory;
@@ -27,7 +28,6 @@ import ru.redw4y.HomeAccounting.models.User;
 import ru.redw4y.HomeAccounting.repository.CashAccountRepository;
 import ru.redw4y.HomeAccounting.repository.UserRepository;
 import ru.redw4y.HomeAccounting.util.DateUtil;
-import ru.redw4y.HomeAccounting.util.OperationModel;
 import ru.redw4y.HomeAccounting.util.OperationType;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,7 +41,7 @@ class OperationsServiceTest {
 	@Mock
 	private CashAccountRepository accountRepository;
 	
-	private OperationModel model;
+	private OperationDTO model;
 	private List<Income> incomes;
 	private List<Outcome> outcomes;
 	private User user;
@@ -88,7 +88,7 @@ class OperationsServiceTest {
 	}
 	
 	void createSetUp() {
-		model = new OperationModel.Builder()
+		model = new OperationDTO.Builder()
 				.id(0)
 				.userID(0)
 				.type("outcome")
@@ -212,23 +212,82 @@ class OperationsServiceTest {
 		assertThrows(NoSuchElementException.class,() -> service.create(model));
 	}
 	@Test
-	void delete_CorrectModel() {
-		model = new OperationModel.Builder().id(0).type("outcome").build();
+	void delete_CorrectOutcome() {
+		model = new OperationDTO.Builder().id(0).type("outcome").build();
 		Outcome outcome = outcomes.get(0);
+		BigDecimal expectedBalance = outcome.getCashAccount().getBalance().add(outcome.getAmount());
 		when(entityManager.find(Outcome.class, 0)).thenReturn(outcome);
 		service.delete(model);
 		assertNull(outcome.getUser());
 		assertFalse(user.getOutcomes().contains(outcome));
+		assertEquals(expectedBalance, outcome.getCashAccount().getBalance());
+	}
+	@Test
+	void delete_CorrectIncome() {
+		model = new OperationDTO.Builder().id(0).type("income").build();
+		Income income = incomes.get(0);
+		BigDecimal expectedBalance = income.getCashAccount().getBalance().subtract(income.getAmount());
+		when(entityManager.find(Income.class, 0)).thenReturn(income);
+		service.delete(model);
+		assertNull(income.getUser());
+		assertFalse(user.getIncomes().contains(income));
+		assertEquals(expectedBalance, income.getCashAccount().getBalance());
 	}
 	@Test
 	void delete_OperationNotFound() {
-		model = new OperationModel.Builder().id(0).type("outcome").build();
+		model = new OperationDTO.Builder().id(0).type("outcome").build();
 		when(entityManager.find(Outcome.class, 0)).thenReturn(null);
 		assertThrows(NullPointerException.class, ()-> service.delete(model));
 	}
 	@Test 
-	void edit_correctArgs() {
+	void edit_correctArgs_Outcome() {
+		model = new OperationDTO.Builder()
+				.id(0)
+				.userID(0)
+				.type("outcome")
+				.date("2023-08-20")
+				.cashAccountID(1)
+				.categoryID(0)
+				.amount(200.0)
+				.comment("Comment")
+				.build();
+		CashAccount newAccount = new CashAccount.Builder().id(1).balance(new BigDecimal(300)).build();
 		
+		when(entityManager.find(Outcome.class, 0)).thenReturn(outcomes.get(0));
+		when(accountRepository.findById(1)).thenReturn(Optional.of(newAccount));
+		when(entityManager.find(OutcomeCategory.class, 0)).thenReturn(outcomeCategory);
+		
+		BigDecimal expectedAccountBalance = account.getBalance().add(outcomes.get(0).getAmount());
+		BigDecimal expectedNewAccountBalance = newAccount.getBalance().subtract(new BigDecimal(model.getAmount()));
+		
+		service.edit(model);
+		assertEquals(expectedAccountBalance, account.getBalance());
+		assertEquals(expectedNewAccountBalance, newAccount.getBalance());
+	}
+	@Test 
+	void edit_correctArgs_Income() {
+		model = new OperationDTO.Builder()
+				.id(0)
+				.userID(0)
+				.type("income")
+				.date("2023-08-20")
+				.cashAccountID(1)
+				.categoryID(0)
+				.amount(200.0)
+				.comment("Comment")
+				.build();
+		CashAccount newAccount = new CashAccount.Builder().id(1).balance(new BigDecimal(300)).build();
+		
+		when(entityManager.find(Income.class, 0)).thenReturn(incomes.get(0));
+		when(accountRepository.findById(1)).thenReturn(Optional.of(newAccount));
+		when(entityManager.find(IncomeCategory.class, 0)).thenReturn(incomeCategory);
+		
+		BigDecimal expectedAccountBalance = account.getBalance().subtract(incomes.get(0).getAmount());
+		BigDecimal expectedNewAccountBalance = newAccount.getBalance().add(new BigDecimal(model.getAmount()));
+		
+		service.edit(model);
+		assertEquals(expectedAccountBalance, account.getBalance());
+		assertEquals(expectedNewAccountBalance, newAccount.getBalance());
 	}
 
 }

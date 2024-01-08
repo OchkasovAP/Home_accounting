@@ -5,14 +5,15 @@ import java.util.Optional;
 
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import ru.redw4y.HomeAccounting.dto.PasswordDTO;
 import ru.redw4y.HomeAccounting.models.User;
 import ru.redw4y.HomeAccounting.repository.RoleRepository;
 import ru.redw4y.HomeAccounting.repository.UserRepository;
-import ru.redw4y.HomeAccounting.util.PasswordModel;
 
 @Service
 @Transactional(readOnly = true)
@@ -25,14 +26,14 @@ public class UserService {
 	private PasswordEncoder encoder;
 
 	@Transactional
-	public void create(User user, PasswordModel password) {
+	public void create(User user, PasswordDTO password) {
 		user.setRole(roleRepository.findByName("USER").get());
 		user.setPassword(encoder.encode(password.getUpdated()));
 		userRepository.save(user);
 	}
 
 	@Transactional
-	public void edit(User user, PasswordModel password) {
+	public void edit(User user, PasswordDTO password) {
 		User userFromDB = userRepository.findById(user.getId()).get();
 		Hibernate.initialize(userFromDB);
 		userFromDB.setLogin(user.getLogin());
@@ -43,11 +44,13 @@ public class UserService {
 	}
 
 	@Transactional
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public void delete(int id) {
 		userRepository.deleteById(id);
 	}
 
 	@Transactional(readOnly = true)
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public List<User> findAll() {
 		return userRepository.findAll();
 	}

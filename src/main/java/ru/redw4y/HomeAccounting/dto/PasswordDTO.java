@@ -1,4 +1,4 @@
-package ru.redw4y.HomeAccounting.util;
+package ru.redw4y.HomeAccounting.dto;
 
 import org.springframework.stereotype.Component;
 
@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 @Component
-public class PasswordModel {
+public class PasswordDTO {
 	private String current;
 	@Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{6,}$"
 			, message = "Пароль должен иметь 1 цифру, 1 строчную, 1 прописную латинскую букву")
@@ -16,7 +16,7 @@ public class PasswordModel {
 	private String written;
 	
 	public static class Builder {
-		private PasswordModel model = new PasswordModel();
+		private PasswordDTO model = new PasswordDTO();
 		
 		public Builder current(String current) {
 			model.setCurrent(current);
@@ -34,7 +34,7 @@ public class PasswordModel {
 			model.setWritten(written);
 			return this;
 		}
-		public PasswordModel build() {
+		public PasswordDTO build() {
 			return model;
 		}
 	}
