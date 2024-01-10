@@ -51,17 +51,17 @@
 <body>
 	<div th:if="${type.equals('income')}">
 		<label class="pushedButton">Доходы</label>
-		<a th:href="@{/categories?type=outcome}" class="button">Расходы</a>
+		<a th:href="@{/categories/outcome}" class="button">Расходы</a>
 	</div>
 	<div th:if="${type.equals('outcome')}">
-		<a th:href="@{/categories?type=income}" class="button">Доходы</a>
+		<a th:href="@{/categories/income}" class="button">Доходы</a>
 		<label class="pushedButton">Расходы</label>
 	</div>
 	<div th:each="category : ${categories}">
-		<a th:href="@{/categories/}+${category.getId()}+'/'+${type}" th:text="${category.getName()}"
+		<a th:href="@{/categories/}+${type}+'/'+${category.getId()}" th:text="${category.getName()}"
 			class="category">Category</a>
 	</div>
-	<a th:href="@{categories/new?type=}+${type}" class="button">Создать категорию</a><br />
+	<a th:href="@{/categories/new/}+${type}" class="button">Создать категорию</a><br />
 	<a th:href="@{/menu}" class="button">Меню</a>
 </body>
 

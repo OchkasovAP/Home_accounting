@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Создание операции</title>
+	<style>
+		.button {
+			display: inline-block;
+			border: 1px solid rgb(0, 0, 0);
+			color: rgb(0, 0, 0);
+			padding: 0 12px;
+			margin: 5px;
+			text-decoration: none;
+			background: #f2f2f2;
+			font-size: 12pt;
+			cursor: pointer;
+		}
+
+		.button:hover {
+			background: #e6e6ff;
+		}
+	</style>
+</head>
+
+<body>
+	<form th:method="POST" th:action="@{/operations/{type} (type=${type})}" th:object="${operation}">
+		<h3 th:if="${type.equals('income')}">Доход:</h3>
+		<h3 th:if="${type.equals('outcome')}">Расход:</h3>
+		Сумма: <input type="number" th:field="*{amount}">
+		<label th:if="${#fields.hasErrors('amount')}" style="color:red;" th:errors="*{amount}">Валидация суммы</label>
+		<br>
+		Счет:<select th:field="*{account}">
+			<option th:each="cashAccount : ${cashAccounts}" th:value="${cashAccount.name}"
+				th:text="${cashAccount.name}" />
+		</select>
+		<label th:if="${#fields.hasErrors('account')}" style="color:red;" th:errors="*{account}">Валидация счета</label>
+		<br>
+		Категория:<select th:field="*{category}">
+			<option th:each="category : ${categories}" th:value="${category.name}" th:text="${category.name}" />
+		</select>
+		<label th:if="${#fields.hasErrors('category')}" style="color:red;" th:errors="*{category}">Валидация категории</label>
+		<br>
+		Дата:<input type="date" th:field="*{date}">
+		<label th:if="${#fields.hasErrors('date')}" style="color:red;" th:errors="*{date}">Валидация даты</label>
+		<br>
+		Комментарий:<input type="text" th:field="*{comment}">
+		<label th:if="${#fields.hasErrors('comment')}" style="color:red;" th:errors="*{comment}">Валидация комментария</label>
+		<br>
+		<input type="submit" class="button" th:value="Создать">
+	</form>
+	<a th:href="@{/}" class="button">Главная страница</a>
+</body>
+
+</html>

@@ -19,11 +19,11 @@
     </style>
 </head>
 <body>
-	<div th:each="user : ${userList}">
+	<div th:each="user : ${users}">
 		<form th:method="DELETE" th:action="@{users/{id} (id=${user.getId()})}">
-			<label th:text="'Пользователь: Id = '+${user.getId()}+'   login - '+${user.getLogin()}+'   role - '+${user.getRole().getName()}"/>
+			<label th:text="'Пользователь: Id = '+${user.getId()}+'   login - '+${user.getLogin()}+'   role - '+${user.getRole()}"/>
 			<a th:href="@{users/{id} (id=${user.getId()})}" class="button">Редактировать</a>
-			<input th:if="${user.getId()}!=${principal.getId()}" type="submit" class="button" th:value="Удалить"/>
+			<input th:if="${user.getId()}!=${principalId}" type="submit" class="button" th:value="Удалить"/>
 		</form>
 	</div>
 	<a th:href="@{/menu}" class="button">Назад в меню</a>

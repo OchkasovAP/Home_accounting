@@ -45,58 +45,45 @@
 			font-size: 12pt;
 			cursor: pointer;
 		}
-
-		.margin {
-			
-		}
 	</style>
 </head>
-
+<!-- TODO -->
 <body>
-	<form th:method="GET" th:action="@{/operations}" th:object="${filter}">
-		<a th:href="@{/menu}" class="button">Меню</a>
-		<input type="hidden" name="startDate" th:value="${viewModel.startDate}">
-		<input type="hidden" name="endDate" th:value="${viewModel.endDate}">
-		<input type="hidden" th:field="*{cashAccountID}">
-		<input type="hidden" th:field="*{userID}">
-		<input type="hidden" th:field="*{type}">
-		<input type="submit" value="Показать все операции" class="button">
-	</form>
+	<a th:href="@{/operations/}+${type}" class="button">Показать все операции</a>
+	<a th:href="@{/menu}" class="button">Меню</a>
 	<hr>
-	<form th:method="GET" th:action="@{/}" th:object="${viewModel}">
+	<form th:method="GET" th:action="@{/}" th:object="${filter}">
 		<input type="submit" hidden><br>
-		<input type="hidden" th:field="*{userID}">
-		<input type="hidden" th:field="*{cashAccountID}">
-		<div class="margin">
-			Счет:<select th:onchange="window.location = this.value" th:object="${viewModel}" id="account">
-				<option selected disabled th:text="*{cashAccountName}"></option>
-				<option th:value="@{/?startDate=}+*{startDate}+'&endDate='
-			+*{endDate}+'&type='+*{type}+'&userID='+*{userID}">Итого</option>
-				<option th:each="cashAccount : ${cashAccounts}" th:value="@{/?startDate=}+*{startDate}+'&endDate='
-			+*{endDate}+'&type='+*{type}+'&userID='+*{userID}+'&cashAccountID='+${cashAccount.id}"
+		<div>
+			Счет:<select th:onchange="window.location = this.value" th:object="${filter.filter}" id="account">
+				<option selected disabled th:text="${disabledAccount}"></option>
+				<option th:value="@{/}+${type}+'?startDate='+*{startDate}+'&endDate='
+			+*{endDate}">Итого</option>
+				<option th:each="cashAccount : ${cashAccounts}" th:value="@{/}+${type}+'?startDate='+*{startDate}+
+			'&endDate='+*{endDate}+'&account='+${cashAccount.name}"
 					th:text="${cashAccount.name}" />
 			</select>
 		</div>
-		<h2 th:text="'Баланс: '+*{generalBalance}" class="margin">General Balance</h2>
-		<div class="margin">
-			<a th:href="@{/operations/new?type=}+${viewModel.type}" class="button">+</a>
+		<h2 th:text="'Баланс: '+${generalBalance}">General Balance</h2>
+		<div>
+			<a th:href="@{/operations/}+${type}+'/new'" class="button">+</a>
 		</div>
 		<hr>
 		<label for="startDate">Начало:</label>
-		<input type="date" th:field="*{startDate}" id="startDate">
+		<input type="date" th:field="*{dateRange.startDate}" id="startDate">
 		<label for="endDate">Конец:</label>
-		<input type="date" th:field="*{endDate}" id="endDate">
+		<input type="date" th:field="*{dateRange.endDate}" id="endDate">
 		<br>
 	</form>
-	<div th:if="${viewModel.type.equals('income')}" th:object="${viewModel}" class="margin">
-		<a th:href="@{/?}+*{linkParameters}+'&type=outcome'" class="button">Расходы</a>
+	<div th:if="${type.equals('income')}" th:object="${viewModel}">
+		<a th:href="@{/outcome?}+*{linkParameters}" class="button">Расходы</a>
 		<label class="pushedButton">Доходы</label>
 	</div>
-	<div th:if="${viewModel.type.equals('outcome')}" th:object="${viewModel}" class="margin">
+	<div th:if="${type.equals('outcome')}" th:object="${viewModel}">
 		<label class="pushedButton">Расходы</label>
-		<a th:href="@{/?}+*{linkParameters}+'&type=income'" class="button">Доходы</a>
+		<a th:href="@{/income?}+*{linkParameters}" class="button">Доходы</a>
 	</div>
-	<p th:each="categoryID : ${viewModel.predentedCategories.keySet()}">
+	<p th:each="category : ${predentedCategories.keySet()}">
 		<a th:href="@{/operations?}+${viewModel.linkParameters}+'&type='+*{viewModel.type}+'&categoryID='+${categoryID}"
 			class="category" th:text="${viewModel.predentedCategories.get(categoryID)}"></a>
 	</p>

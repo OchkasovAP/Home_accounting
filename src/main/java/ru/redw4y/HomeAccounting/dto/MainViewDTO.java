@@ -19,18 +19,10 @@ public class MainViewDTO {
 	private String type = "outcome";
 	private Integer userID;
 	private String linkParameters;
-	private Map<Integer, String> predentedCategories = new HashMap<>();
+	private Map<String, String> predentedCategories = new HashMap<>();
 
 	public MainViewDTO() {
 		super();
-		Calendar today = Calendar.getInstance();
-		long dayOfTheWeek = today.get(Calendar.DAY_OF_WEEK);
-		long day = 1000*60*60*24;
-		dayOfTheWeek = (dayOfTheWeek+5)%7;
-		long lastWeek = today.getTimeInMillis();
-		lastWeek -= dayOfTheWeek*day;
-		startDate = DateUtil.convertDateToString(new Date(lastWeek));
-		endDate = DateUtil.convertDateToString(today.getTime());
 	}
 
 	public double getAmountInPeriod() {
@@ -41,7 +33,7 @@ public class MainViewDTO {
 		this.amountInPeriod = amountInPeriod;
 	}
 
-	public void setPredentedCategories(Map<Integer, String> predentedCategories) {
+	public void setPredentedCategories(Map<String, String> predentedCategories) {
 		this.predentedCategories = predentedCategories;
 	}
 
@@ -60,7 +52,7 @@ public class MainViewDTO {
 		return startDate;
 	}
 
-	public Map<Integer, String> getPredentedCategories() {
+	public Map<String, String> getPredentedCategories() {
 		return predentedCategories;
 	}
 

@@ -80,7 +80,7 @@ public class Outcome implements Operation {
 			return this;
 		}
 
-		public Builder category(IncomeCategory category) {
+		public Builder category(OutcomeCategory category) {
 			outcome.setCategory(category);
 			return this;
 		}

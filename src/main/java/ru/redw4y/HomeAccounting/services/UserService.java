@@ -10,7 +10,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ru.redw4y.HomeAccounting.dto.PasswordDTO;
 import ru.redw4y.HomeAccounting.models.User;
 import ru.redw4y.HomeAccounting.repository.RoleRepository;
 import ru.redw4y.HomeAccounting.repository.UserRepository;
@@ -18,33 +17,39 @@ import ru.redw4y.HomeAccounting.repository.UserRepository;
 @Service
 @Transactional(readOnly = true)
 public class UserService {
+	private final UserRepository userRepository;
+	private final RoleRepository roleRepository;
+	private final PasswordEncoder encoder;
+
 	@Autowired
-	private UserRepository userRepository;
-	@Autowired
-	private RoleRepository roleRepository;
-	@Autowired
-	private PasswordEncoder encoder;
+	public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder) {
+		super();
+		this.userRepository = userRepository;
+		this.roleRepository = roleRepository;
+		this.encoder = encoder;
+	}
 
 	@Transactional
-	public void create(User user, PasswordDTO password) {
+	public void create(User user) {
 		user.setRole(roleRepository.findByName("USER").get());
-		user.setPassword(encoder.encode(password.getUpdated()));
+		user.setPassword(encoder.encode(user.getPassword()));
 		userRepository.save(user);
 	}
 
 	@Transactional
-	public void edit(User user, PasswordDTO password) {
+	public void edit(User user) {
 		User userFromDB = userRepository.findById(user.getId()).get();
 		Hibernate.initialize(userFromDB);
 		userFromDB.setLogin(user.getLogin());
-		if (!(password.getCurrent()==null||"".equals(password.getCurrent()))) {
-			userFromDB.setPassword(encoder.encode(password.getUpdated()));
-		} 
+		userFromDB.setPassword(encoder.encode(user.getPassword()));
+		if (user.getRole() != null) {
+			String roleName = user.getRole().getName().toUpperCase();
+			userFromDB.setRole(roleRepository.findByName(roleName.equals("ADMIN") ? "ADMIN" : "USER").get());
+		}
 		userRepository.save(userFromDB);
 	}
 
 	@Transactional
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public void delete(int id) {
 		userRepository.deleteById(id);
 	}
@@ -59,21 +64,10 @@ public class UserService {
 	public User findById(int id) {
 		return userRepository.findById(id).get();
 	}
-	
+
 	@Transactional(readOnly = true)
 	public Optional<User> findByLogin(String login) {
 		return userRepository.findByLogin(login);
 	}
 
-	@Transactional
-	public User getFullUser(int id) {
-		User user = userRepository.findById(id).get();
-		Hibernate.initialize(user);
-		user.getCashAccounts().isEmpty();
-		user.getIncomeCategories().isEmpty();
-		user.getOutcomeCategories().isEmpty();
-		user.getIncomes().isEmpty();
-		user.getOutcomes().isEmpty();
-		return user;
-	}
 }

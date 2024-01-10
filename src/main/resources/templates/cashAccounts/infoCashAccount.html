@@ -25,8 +25,10 @@
 	<form th:method="PATCH" th:action="@{/cashAccounts}" th:object="${cashAccount}">
 		<input type="hidden" th:field="*{id}">
 		Имя: <input type="text" th:field="*{name}">
+		<label th:if="${#fields.hasErrors('name')}" style="color:red" th:errors="*{name}" />
 		<br>
 		Баланс: <input type="text" th:field="*{balance}">
+		<label th:if="${#fields.hasErrors('balance')}" style="color:red" th:errors="*{balance}" />
 		<br>
 		Учитывать в общем балансе: <input type="radio" th:field="*{containInGenBalance}" id="true" name="inGenBalance" value="true" checked/>
 		<label for="true">Да</label>

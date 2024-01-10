@@ -25,20 +25,20 @@
 
 <body>
 	<h1>Регистрация</h1>
-	<form th:method="POST" th:action="@{/users/registration}" >
-		
+	<form th:method="POST" th:action="@{/users/registration}" th:object="${user}" >
 		<label for="login">Логин</label>
-		<input type="text" th:field="*{user.login}" id="login" />
-		<label th:if="${#fields.hasErrors('${user.login}')}" style="color:red" th:errors="${user.login}" />
+		<input type="text" th:field="*{login}" id="login" />
+		<label th:if="${#fields.hasErrors('login')}" style="color:red" th:errors="*{login}" />
 		<br />
-		Новый пароль: <input type="password" th:field="*{password.updated}" />
-		<label th:if="${#fields.hasErrors('${password.updated}')}" style="color:red" th:errors="${password.updated}" />
+		Новый пароль: <input type="password" th:field="*{password}" />
+		<label th:if="${#fields.hasErrors('password')}" style="color:red" th:errors="*{password}" />
 		<br />
-		Повторите пароль: <input type="password" th:field="*{password.repeated}" />
+		Повторите пароль: <input type="password" th:field="*{repeatedNewPassword}" />
+		<label th:if="${#fields.hasErrors('repeatedNewPassword')}" style="color:red" th:errors="*{repeatedNewPassword}" />
 		<br />
 		<input type="submit" value="Зарегистрироваться">
 	</form>
-	<a th:href="@{/}" class="button">Назад</a>
+	<a th:href="@{/login}" class="button">Назад</a>
 </body>
 
 </html>

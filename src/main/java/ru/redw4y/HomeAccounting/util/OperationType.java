@@ -11,9 +11,11 @@ public enum OperationType {
 	INCOME(Income.class, IncomeCategory.class), OUTCOME(Outcome.class, OutcomeCategory.class);
 
 	public static OperationType getTypeFromName(String typeName) {
-		for (OperationType type : OperationType.values()) {
-			if (typeName.toUpperCase().equals(type.name())) {
-				return type;
+		if (typeName != null) {
+			for (OperationType type : OperationType.values()) {
+				if (typeName.toUpperCase().equals(type.name())) {
+					return type;
+				}
 			}
 		}
 		return OperationType.OUTCOME;

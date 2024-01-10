@@ -1,121 +1,104 @@
 package ru.redw4y.HomeAccounting.dto;
 
+import java.math.BigDecimal;
+import java.util.Date;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import ru.redw4y.HomeAccounting.util.DateUtil;
 import ru.redw4y.HomeAccounting.util.Operation;
 
 public class OperationDTO {
-	private Integer id;
-	private Integer cashAccountID;
-	private Integer categoryID;
-	private Integer userID;
-	private String date;
-	private String type;
+	private int id;
+	@NotNull(message = "Поле не должно быть пустым")
+	private String account;
+	@NotNull(message = "Поле не должно быть пустым")
+	private String category;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@NotNull(message = "Поле не должно быть пустым")
+	private Date date;
+	@Size(max=50, message = "Комментарий не должен превышать 50 символов")
 	private String comment;
-	private Double amount;
+	@NotNull(message = "Поле не должно быть пустым")
+	private BigDecimal amount;
 	
 	public OperationDTO() {
 		super();
 	}
 	
 	public static class Builder{
-		private OperationDTO model;
+		private OperationDTO operationDTO;
 		public Builder() {
-			model = new OperationDTO();
+			operationDTO = new OperationDTO();
 		}
 		public Builder id(int id) {
-			model.setId(id);
+			operationDTO.setId(id);
 			return this;
 		}
-		public Builder cashAccountID(Integer id) {
-			model.setCashAccountID(id);
+		public Builder cashAccount(String account) {
+			operationDTO.setAccount(account);
 			return this;
 		}
-		public Builder categoryID(Integer id) {
-			model.setCategoryID(id);
+		public Builder category(String category) {
+			operationDTO.setCategory(category);
 			return this;
 		}
-		public Builder userID(Integer id) {
-			model.setUserID(id);
-			return this;
-		}
-		public Builder date(String date) {
-			model.setDate(date);
-			return this;
-		}
-		public Builder type(String type) {
-			model.setType(type);
+		public Builder date(Date date) {
+			operationDTO.setDate(date);
 			return this;
 		}
 		public Builder comment(String comment) {
-			model.setComment(comment);
+			operationDTO.setComment(comment);
 			return this;
 		}
-		public Builder amount(Double amount) {
-			model.setAmount(amount);
+		public Builder amount(BigDecimal amount) {
+			operationDTO.setAmount(amount);
 			return this;
 		}
 		public OperationDTO build() {
-			return model;
+			return operationDTO;
 		}
 	}
-	
-	public OperationDTO(Operation operation) {
-		userID = operation.getUser().getId();
-		categoryID = operation.getCategory().getId();
-		cashAccountID = operation.getCashAccount().getId();
-		date = DateUtil.convertDateToString(operation.getDate());
-		type = operation.getType().name().toLowerCase();
-		comment = operation.getComment();
-		amount = operation.getAmount().doubleValue();
-	}
 
-	public Integer getId() {
+
+
+	public int getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
-	public Integer getCashAccountID() {
-		return cashAccountID;
+	public String getAccount() {
+		return account;
 	}
 
-	public void setCashAccountID(Integer cashAccountId) {
-		this.cashAccountID = cashAccountId;
+	public void setAccount(String account) {
+		this.account = account;
 	}
 
-	public Integer getCategoryID() {
-		return categoryID;
+	public String getCategory() {
+		return category;
 	}
 
-	public void setCategoryID(Integer categoryID) {
-		this.categoryID = categoryID;
+	public void setCategory(String category) {
+		this.category = category;
 	}
 
-	public Integer getUserID() {
-		return userID;
-	}
-
-	public void setUserID(Integer userID) {
-		this.userID = userID;
-	}
-
-	public String getDate() {
+	public Date getDate() {
 		return date;
 	}
 
-	public void setDate(String date) {
+	public void setDate(Date date) {
 		this.date = date;
 	}
 
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
 
 	public String getComment() {
 		return comment;
@@ -125,18 +108,17 @@ public class OperationDTO {
 		this.comment = comment;
 	}
 
-	public Double getAmount() {
+	public BigDecimal getAmount() {
 		return amount;
 	}
 
-	public void setAmount(Double amount) {
+	public void setAmount(BigDecimal amount) {
 		this.amount = amount;
 	}
-
 	@Override
 	public String toString() {
-		return "OperationDTO [cashAccountID=" + cashAccountID + ", categoryID=" + categoryID + ", userID=" + userID
-				+ ", date=" + date + ", type=" + type + ", comment=" + comment + ", amount=" + amount + "]";
+		return "[дата=" + DateUtil.convertDateToString(date) + ", расход = " + amount + ", счет: " + account + ", категория: "
+				+ category + ", комментарий: "
+						+ comment +"]";
 	}
-	
 }

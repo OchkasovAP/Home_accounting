@@ -1,6 +1,7 @@
 package ru.redw4y.HomeAccounting.services;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
@@ -22,6 +23,8 @@ import ru.redw4y.HomeAccounting.models.CashAccount;
 import ru.redw4y.HomeAccounting.models.User;
 import ru.redw4y.HomeAccounting.repository.CashAccountRepository;
 import ru.redw4y.HomeAccounting.repository.UserRepository;
+import ru.redw4y.HomeAccounting.util.exceptions.ForbiddenUsersActionException;
+
 
 @ExtendWith(MockitoExtension.class)
 class CashAccountsServiceTest {
@@ -32,42 +35,62 @@ class CashAccountsServiceTest {
 	@Mock
 	private CashAccountRepository accountRepository;
 	
-	private List<CashAccount> cashAccounts;
+	private List<CashAccount> accounts;
+	private CashAccount account;
+	private CashAccount editAccount;
+	private User user;
 	@BeforeEach
 	void setUp() {
-		cashAccounts = new ArrayList<>();
-		cashAccounts.add(new CashAccount.Builder()
+		user = new User.Builder().id(0).build();
+		accounts = new ArrayList<>();
+		accounts.add(new CashAccount.Builder()
 				.id(2)
-				.name("CashAccount0")
+				.name("CashAccount2")
 				.balance(new BigDecimal(100))
 				.containInGenBalance(true)
+				.user(user)
 				.build());
-		cashAccounts.add(new CashAccount.Builder()
+		accounts.add(new CashAccount.Builder()
 				.id(1)
 				.name("CashAccount1")
 				.balance(new BigDecimal(100))
 				.containInGenBalance(true)
+				.user(user)
 				.build());
-		cashAccounts.add(new CashAccount.Builder()
+		accounts.add(new CashAccount.Builder()
 				.id(0)
-				.name("CashAccount2")
+				.name("CashAccount0")
 				.balance(new BigDecimal(100))
 				.containInGenBalance(false)
+				.user(user)
 				.build());
+		account = new CashAccount.Builder()
+				.id(3)
+				.name("CashAccount3")
+				.balance(new BigDecimal(100))
+				.containInGenBalance(true)
+				.build();
+		editAccount = new CashAccount.Builder()
+				.id(0)
+				.name("EditCashAccount")
+				.balance(new BigDecimal(200))
+				.containInGenBalance(true)
+				.user(user)
+				.build();
 	}
 	@Test
 	void getGeneralBalance() {
 		BigDecimal expected = new BigDecimal(200);
-		BigDecimal actual = service.getGeneralBalance(cashAccounts);
+		BigDecimal actual = service.getGeneralBalance(accounts);
 		assertEquals(expected, actual);
 	}
 	
 	@Test
 	void findAllByUser_PresentUser() {
-		when(userRepository.findById(0)).thenReturn(Optional.of(new User.Builder().cashAccounts(cashAccounts).build()));
+		when(userRepository.findById(0)).thenReturn(Optional.of(new User.Builder().cashAccounts(accounts).build()));
 		List<CashAccount> actual = service.findAllByUser(0);
-		assertNotEquals(cashAccounts, actual);
-		assertEquals(cashAccounts.stream().sorted(Comparator.comparing(ca -> ca.getId())).toList(), actual);
+		assertNotEquals(accounts, actual);
+		assertEquals(accounts.stream().sorted(Comparator.comparing(ca -> ca.getId())).toList(), actual);
 	}
 	
 	@Test
@@ -77,8 +100,8 @@ class CashAccountsServiceTest {
 	}
 	@Test
 	void create_CorrectArguments() {
-		User user = new User.Builder().cashAccounts(cashAccounts).build();
-		CashAccount cashAccount = cashAccounts.get(0);
+		User user = new User.Builder().cashAccounts(accounts).build();
+		CashAccount cashAccount = account;
 		when(userRepository.findById(0)).thenReturn(Optional.of(user));
 		service.create(0, cashAccount);
 		assertEquals(user, cashAccount.getUser());
@@ -93,9 +116,47 @@ class CashAccountsServiceTest {
 
 	@Test
 	void create_NullCashAccount() {
-		when(userRepository.findById(0)).thenReturn(Optional.of(new User.Builder().cashAccounts(cashAccounts).build()));
+		when(userRepository.findById(0)).thenReturn(Optional.of(new User.Builder().cashAccounts(accounts).build()));
 		assertThrows(NullPointerException.class, () -> service.create(0, null));
 	}
+	@Test
+	void findById() {
+		when(accountRepository.findById(0)).thenReturn(Optional.of(accounts.get(0)));
+		assertEquals(accounts.get(0),service.findById(0, 0));
+	} 
+	@Test
+	void findById_User_Without_Rights() {
+		when(accountRepository.findById(0)).thenReturn(Optional.of(accounts.get(0)));
+		assertThrows(ForbiddenUsersActionException.class, () -> service.findById(1, 0));
+	} 
 	
-
+	@Test 
+	void findByNameAndUser() {
+		when(accountRepository.findByNameAndUser("CashAccount3", user)).thenReturn(Optional.of(account));
+		assertEquals(account, service.findByNameAndUser(account.getName(), user).get());
+	}
+	
+	@Test
+	void edit() {
+		when(accountRepository.findById(0)).thenReturn(Optional.of(editAccount));
+		when(accountRepository.save(editAccount)).thenReturn(editAccount);
+		assertDoesNotThrow(() -> service.edit(editAccount));
+	}
+	@Test
+	void edit_User_Without_Rights() {
+		when(accountRepository.findById(0)).thenReturn(Optional.of(new CashAccount.Builder().user(new User.Builder().id(1).build()).build()));
+		assertThrows(ForbiddenUsersActionException.class,() -> service.edit(editAccount));
+	}
+	@Test
+	void remove() {
+		doNothing().when(accountRepository).deleteById(0);
+		when(accountRepository.findById(0)).thenReturn(Optional.of(accounts.get(0)));
+		assertDoesNotThrow(() -> service.remove(0,0));
+	}
+	@Test
+	void remove_User_Without_Rights() {
+		when(accountRepository.findById(0)).thenReturn(Optional.of(accounts.get(0)));
+		assertThrows(ForbiddenUsersActionException.class,() -> service.remove(1,0));
+	}
+ 
 }

@@ -22,17 +22,17 @@
 	</style>
 </head>
 <body>
-	<form th:method="PATCH" th:action="@{/categories/{id} (id=${category.getId()})}">
-		Имя: <input type="text" name="name" th:value="${category.getName()}">
+	<form th:method="PATCH" th:action="@{/categories/{type} (type=${type})}" th:object="${category}">
+		Имя: <input type="text" th:field="*{name}">
+		<label th:if="${#fields.hasErrors('name')}" style="color:red" th:errors="*{name}" />
 		<br>
-		<input type="hidden" name="type" th:value="${type}">
+		<input type="hidden"  th:field="*{id}">
 		<input type="submit" class="button" value="Редактировать">
 	</form>
-	<form th:method="DELETE" th:action="@{/categories/deleteCategory/{id} (id=${category.getId()})}">
-		<input type="hidden" name="type" th:value="${type}">
+	<form th:method="DELETE" th:action="@{/categories/{type}/{id} (id=${category.getId()}, type=${type})}">
 		<input type="submit" class="button" value="Удалить">
 	</form>
-	<a th:href="@{/categories?type=}+${type}" class="button">Назад</a> <br/>
+	<a th:href="@{/categories/}+${type}" class="button">Назад</a> <br/>
 
 </body>
 </html>

@@ -25,32 +25,28 @@
 
 <body>
 	<h1>Редактирование пользователя</h1>
-	<form th:method="PATCH" th:action="@{/users/edit}">
-		<input type="hidden" th:field="*{user.id}" />
+	<form th:method="PATCH" th:action="@{/users}" th:object="${user}">
+		<input type="hidden" th:field="*{id}" />
 	<label for="login">Логин</label>
-		<input type="text" th:field="*{user.login}" id="login" />
-		<label th:if="${#fields.hasErrors('${user.login}')}" style="color:red" th:errors="${user.login}" />
-		<input type="hidden" th:field="*{user.password}" />
-		<input type="hidden" id="current" name="current" th:value="*{user.password}" />
+		<input type="text" th:field="*{login}" id="login" />
+		<label th:if="${#fields.hasErrors('login')}" style="color:red" th:errors="*{login}" />
 		<br />
-		Старый пароль: <input type="password" th:field="*{password.written}" />
-		<label th:if="${#fields.hasErrors('${password.current}')}" style="color:red" th:errors="${password.current}" />
+		Старый пароль: <input type="password" th:field="*{password}" />
+		<label th:if="${#fields.hasErrors('password')}" style="color:red" th:errors="*{password}" />
 		<br />
-		Новый пароль: <input type="password" th:field="*{password.updated}" />
-		<label th:if="${#fields.hasErrors('${password.updated}')}" style="color:red" th:errors="${password.updated}" />
+		Новый пароль: <input type="password" th:field="*{newPassword}" />
+		<label th:if="${#fields.hasErrors('newPassword')}" style="color:red" th:errors="*{newPassword}" />
 		<br />
-		Повторите пароль: <input type="password" th:field="*{password.repeated}" />
+		Повторите пароль: <input type="password" th:field="*{repeatedNewPassword}" />
 		<br />
 		<div th:if="${isRoleCorrector}">
-			Роль: <select th:field="*{user.role.id}">
-				<option th:value="1">Admin</option>
-				<option th:value="2">User</option>
+			Роль: <select th:field="*{role}">
+				<option th:value="'ADMIN'">Admin</option>
+				<option th:value="'USER'">User</option>
 			</select>
 		</div>
-		<input type="hidden" th:if="${!isRoleCorrector}" th:field="*{user.role.id}">
 		<br />
 		<input type="submit" value="Редактировать" class="button" />
-		<input type="hidden" name="isRoleCorrector" th:value="${isRoleCorrector}"/>
 	</form>
 	<a th:if="${isRoleCorrector}" th:href="@{/users}" class="button">Назад</a>
 	<a th:if="${!isRoleCorrector}" th:href="@{/menu}" class="button">Назад</a>
