@@ -25,7 +25,7 @@
 
 <body>
 	<h1>Меню</h1>
-	<a th:href="@{/}" class="button">Главная страница</a><br />
+	<a th:href="@{/main/outcome}" class="button">Главная страница</a><br />
 	<a th:href="@{cashAccounts}" class="button">Счета</a><br />
 	<a th:href="@{categories/outcome}" class="button">Категории</a><br />
 	<div th:if="${user.isAdmin()}">

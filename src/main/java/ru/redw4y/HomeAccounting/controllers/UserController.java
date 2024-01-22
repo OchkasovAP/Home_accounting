@@ -17,6 +17,7 @@ import ru.redw4y.HomeAccounting.util.validators.UserValidator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Stream;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -72,7 +74,7 @@ public class UserController extends AbstractHomeAccountingController {
 				AuthenticationDTO user = convertUserToAuthDTO(userService.findById(id));
 				user.setPassword(null);
 				model.addAttribute("user", user);
-				model.addAttribute("isRoleCorrector", principalUser.isAdmin()&&principalUser.getId()!=id);
+				model.addAttribute("isRoleCorrector", isRoleCorrector(principalUser, id));
 				return "/users/editUser";
 			} catch (NoSuchElementException ex) {
 				throw new HomeAccountingException("Пользователь с таким id не существует");
@@ -102,20 +104,22 @@ public class UserController extends AbstractHomeAccountingController {
 		return "redirect:/users/login";
 	}
 
-	@PatchMapping()//TODO Сделать валидацию пароля только при его изменении
+	@PatchMapping()
 	public String edit(@AuthenticationPrincipal UserDetailsImpl userDetails,
-			@ModelAttribute("user") @Valid AuthenticationDTO userDTO, BindingResult bindingResult) {
+			@ModelAttribute("user") @Valid AuthenticationDTO userDTO, BindingResult bindingResult, Model model) {
 		User currentUser = userDetails.getUser();
 		if (currentUser.isAdmin() || userDetails.getUser().getId() == userDTO.getId()) {
 			userValidator.validate(userDTO, bindingResult);
-			if (bindingResult.hasErrors()) {
+			if (hasEditErrors(userDTO, bindingResult)) {
+				model.addAttribute("isRoleCorrector", isRoleCorrector(currentUser, userDTO.getId()));
 				return "/users/editUser";
 			}
 			if(currentUser.getId()==userDTO.getId()) {
 				userDTO.setRole(currentUser.getRole().getName());
 			}
 			User user = convertDTO(userDTO);
-			if (userDTO.getNewPassword() != null) {
+			String newPassword = userDTO.getNewPassword();
+			if (newPassword != null&&!newPassword.isBlank()) {
 				user.setPassword(userDTO.getNewPassword());
 			}
 			userService.edit(user);
@@ -136,6 +140,15 @@ public class UserController extends AbstractHomeAccountingController {
 		}
 		userService.delete(id);
 		return "redirect:/users";
+	}
+	
+	private boolean isRoleCorrector(User principalUser, int editUserId) {
+		return principalUser.isAdmin()&&principalUser.getId()!=editUserId;
+	}
+	
+	private boolean hasEditErrors(AuthenticationDTO authDTO, BindingResult bindingResult) {
+		return bindingResult.hasErrors()&&(bindingResult.getFieldErrors().stream().anyMatch(t -> t.getField().equals("login"))
+				||(Stream.of(authDTO.getNewPassword(),authDTO.getPassword(), authDTO.getRepeatedNewPassword()).anyMatch(t -> t!=null&&!t.isBlank())));
 	}
 
 	private User convertDTO(AuthenticationDTO userDTO) {

@@ -19,7 +19,7 @@ CREATE TABLE users
 (
     id SERIAL PRIMARY KEY,
     login character varying(20) UNIQUE NOT NULL, 
-    password character varying(20) NOT NULL,
+    password character varying(100) NOT NULL,
 	role_id INT NOT NULL,
 	FOREIGN KEY(role_id) REFERENCES roles(id) ON UPDATE CASCADE ON DELETE CASCADE -- Внешний ключ из таблицы ролей
 );

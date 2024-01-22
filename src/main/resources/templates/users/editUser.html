@@ -38,6 +38,7 @@
 		<label th:if="${#fields.hasErrors('newPassword')}" style="color:red" th:errors="*{newPassword}" />
 		<br />
 		Повторите пароль: <input type="password" th:field="*{repeatedNewPassword}" />
+		<label th:if="${#fields.hasErrors('repeatedNewPassword')}" style="color:red" th:errors="*{repeatedNewPassword}" />
 		<br />
 		<div th:if="${isRoleCorrector}">
 			Роль: <select th:field="*{role}">

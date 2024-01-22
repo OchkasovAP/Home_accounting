@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.minidev.json.JSONArray;
 import net.minidev.json.parser.JSONParser;
-import ru.ochkasovap.homeAccountingRest.dto.OperationDTO;
+import ru.redw4y.HomeAccounting.dto.OperationDTO;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -29,7 +29,9 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
-
+/*
+ * TODO класс взят с REST версии. Необходимо переделать
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")

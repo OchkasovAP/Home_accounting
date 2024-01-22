@@ -18,13 +18,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.minidev.json.JSONArray;
 import net.minidev.json.parser.JSONParser;
-import ru.ochkasovap.homeAccountingRest.dto.UserDTO;
+import ru.redw4y.HomeAccounting.dto.UserDTO;
 
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
+/*
+ * TODO класс взят с REST версии. Необходимо переделать
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")

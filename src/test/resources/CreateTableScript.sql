@@ -23,7 +23,8 @@ CREATE TABLE users
 	role_id INT NOT NULL,
 	FOREIGN KEY(role_id) REFERENCES roles(id) ON UPDATE CASCADE ON DELETE CASCADE -- Внешний ключ из таблицы ролей
 );
-INSERT INTO users (login, password, role_id) VALUES ('admin', 'admin', 1);
+INSERT INTO users (login, password, role_id) VALUES ('admin', '$2a$10$h9bRhb5TBIK30J4KDiJefOpZOuTD3H/KI0Xb5eojXEq3VLlRwn30e', 1); --Пароль "admin"
+INSERT INTO users (login, password, role_id) VALUES ('user', '$2a$10$h9bRhb5TBIK30J4KDiJefOpZOuTD3H/KI0Xb5eojXEq3VLlRwn30e', 2); -- Пароль "user"
 --Создаем таблицу категорий доходов
 CREATE TABLE income_category
 (
@@ -34,6 +35,8 @@ CREATE TABLE income_category
     CONSTRAINT NAME_MIN_SIZE CHECK(LENGTH(name)>0),
     FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE -- Внешний ключ из таблицы пользователей   
 );
+INSERT INTO income_category (name, user_id) VALUES ('TestCategory1', 2);
+INSERT INTO income_category (name, user_id) VALUES ('TestCategory2', 2);
 --Cоздаем таблицу категорий расходов
 CREATE TABLE outcome_category
 (
@@ -44,6 +47,8 @@ CREATE TABLE outcome_category
     CONSTRAINT NAME_MIN_SIZE CHECK(LENGTH(name)>0),
     FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE -- Внешний ключ из таблицы пользователей    
 );
+INSERT INTO outcome_category (name, user_id) VALUES ('TestCategory1', 2);
+INSERT INTO outcome_category (name, user_id) VALUES ('TestCategory2', 2);
 --Создаем таблицу счетов
 CREATE TABLE cash_account
 (
@@ -56,6 +61,8 @@ CREATE TABLE cash_account
     CONSTRAINT NAME_MIN_SIZE CHECK(LENGTH(name)>0),
     FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE -- Внешний ключ из таблицы пользователей
 );
+INSERT INTO cash_account (name, balance, contain_in_gen_balance, user_id) VALUES ('TestAccount1', 1000, true, 2);
+INSERT INTO cash_account (name, balance, contain_in_gen_balance, user_id) VALUES ('TestAccount2', 1000, true, 2);
 --Создаем таблицу расходов
 CREATE TABLE outcomes
 (
@@ -70,6 +77,8 @@ CREATE TABLE outcomes
 	FOREIGN KEY(category_id) REFERENCES outcome_category(id) ON UPDATE CASCADE ON DELETE CASCADE, -- Внешний ключ из таблицы категорий
 	FOREIGN KEY(cash_account_id) REFERENCES cash_account(id) ON UPDATE CASCADE ON DELETE CASCADE -- Внешний ключ из таблицы счетов
 );
+INSERT INTO outcomes (user_id, date, outcome, category_id, cash_account_id, comment) VALUES (2, '2023-01-02' ,100, 1, 1, 'TestComment');
+INSERT INTO outcomes (user_id, date, outcome, category_id, cash_account_id, comment) VALUES (2, '2023-01-01' ,100, 1, 1, 'TestComment');
 --Создаем таблицу доходов
 CREATE TABLE incomes
 (
@@ -84,3 +93,5 @@ CREATE TABLE incomes
 	FOREIGN KEY(category_id) REFERENCES income_category(id) ON UPDATE CASCADE ON DELETE CASCADE, -- Внешний ключ из таблицы категорий
 	FOREIGN KEY(cash_account_id) REFERENCES cash_account(id) ON UPDATE CASCADE ON DELETE CASCADE -- Внешний ключ из таблицы счетов
 );
+INSERT INTO incomes (user_id, date, income, category_id, cash_account_id, comment) VALUES (2, '2023-01-02' ,100, 1, 1, 'TestComment');
+INSERT INTO incomes (user_id, date, income, category_id, cash_account_id, comment) VALUES (2, '2023-01-01' ,100, 1, 1, 'TestComment');

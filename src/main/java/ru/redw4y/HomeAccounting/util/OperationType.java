@@ -1,25 +1,16 @@
 package ru.redw4y.HomeAccounting.util;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 import ru.redw4y.HomeAccounting.models.Income;
 import ru.redw4y.HomeAccounting.models.IncomeCategory;
 import ru.redw4y.HomeAccounting.models.Outcome;
 import ru.redw4y.HomeAccounting.models.OutcomeCategory;
+import ru.redw4y.HomeAccounting.models.User;
 
 public enum OperationType {
 	INCOME(Income.class, IncomeCategory.class), OUTCOME(Outcome.class, OutcomeCategory.class);
-
-	public static OperationType getTypeFromName(String typeName) {
-		if (typeName != null) {
-			for (OperationType type : OperationType.values()) {
-				if (typeName.toUpperCase().equals(type.name())) {
-					return type;
-				}
-			}
-		}
-		return OperationType.OUTCOME;
-	}
 
 	private final Class<? extends Operation> operationClass;
 	private final Class<? extends Category> categoryClass;

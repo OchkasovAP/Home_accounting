@@ -1,12 +1,16 @@
 package ru.redw4y.HomeAccounting.services;
 
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +22,7 @@ import ru.redw4y.HomeAccounting.util.exceptions.ForbiddenUsersActionException;
 import ru.redw4y.HomeAccounting.models.IncomeCategory;
 import ru.redw4y.HomeAccounting.models.OutcomeCategory;
 import ru.redw4y.HomeAccounting.models.User;
+import ru.redw4y.HomeAccounting.repository.UserRepository;
 import ru.redw4y.HomeAccounting.util.Category;
 import ru.redw4y.HomeAccounting.util.OperationType;
 
@@ -25,12 +30,17 @@ import ru.redw4y.HomeAccounting.util.OperationType;
 @Transactional(readOnly = true)
 public class CategoriesService {
 	@Autowired
-	private UserService userService;
+	private UserRepository userRepository;
 	@Autowired
 	private EntityManager entityManager;
 	
+	@Value("${default_Income_Categories}")
+	private String defaultIncomeCategories;
+	@Value("${default_Outcome_Categories}")
+	private String defaultOutcomeCategories;
+	
 	public List<? extends Category> findAllByUser(int userID, OperationType type) {
-		User user = userService.findById(userID);
+		User user = userRepository.findById(userID).get();
 		List<? extends Category> categories = Collections.emptyList();
 		if(OperationType.INCOME.equals(type)) {
 			categories = user.getIncomeCategories();
@@ -66,13 +76,16 @@ public class CategoriesService {
 	}
 	@Transactional
 	public void create(int userID, Category category) {
-		User user = userService.findById(userID);
-		if (category instanceof IncomeCategory) {
-			user.getIncomeCategories().add((IncomeCategory) category);
-		} else if (category instanceof OutcomeCategory) {
-			user.getOutcomeCategories().add((OutcomeCategory) category);
-		}
-		category.setUser(user);
+		User user = userRepository.findById(userID).get();
+		addCategory(category, user);
+	}
+	@Transactional
+	public void addDefaultCategories(int userId) {
+		User user = userRepository.findById(userId).get();
+		user.setIncomeCategories(new ArrayList<>());
+		user.setOutcomeCategories(new ArrayList<>());
+		Stream.of(defaultIncomeCategories.split(";")).forEach(categoryName -> addCategory(OperationType.INCOME.newCategory(categoryName), user));
+		Stream.of(defaultOutcomeCategories.split(";")).forEach(categoryName -> addCategory(OperationType.OUTCOME.newCategory(categoryName), user));
 	}
 	@Transactional
 	public void remove(int userId, int categoryID, OperationType type) {
@@ -86,6 +99,17 @@ public class CategoriesService {
 		}
 		category.setUser(null);
 	}
+	
+	
+	private void addCategory(Category category, User user) {
+		if (category instanceof IncomeCategory) {
+			user.getIncomeCategories().add((IncomeCategory) category);
+		} else if (category instanceof OutcomeCategory) {
+			user.getOutcomeCategories().add((OutcomeCategory) category);
+		}
+		category.setUser(user);
+	}
+	
 	private void checkUsersRights(Category category, int userId) {
 		if(category.getUser().getId()!=userId) {
 			throw new ForbiddenUsersActionException();

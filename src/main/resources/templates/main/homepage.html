@@ -47,21 +47,28 @@
 		}
 	</style>
 </head>
-<!-- TODO -->
 <body>
-	<a th:href="@{/operations/}+${type}" class="button">Показать все операции</a>
+	<a th:href="@{/operations/{type}(type=${type},
+		dateRange.startDate=${#dates.format(filter.dateRange.startDate, 'yyyy-MM-dd')},
+		dateRange.endDate=${#dates.format(filter.dateRange.endDate, 'yyyy-MM-dd')},
+		account=${disabledAccount.equals('Итого')?'':disabledAccount})}" class="button">
+		Показать все операции
+	</a>
 	<a th:href="@{/menu}" class="button">Меню</a>
 	<hr>
-	<form th:method="GET" th:action="@{/}" th:object="${filter}">
+	<form th:method="GET" th:action="@{/main/{type} (type=${type})}" th:object="${filter}">
+		<input type="hidden" th:field="*{account}"/>
 		<input type="submit" hidden><br>
 		<div>
-			Счет:<select th:onchange="window.location = this.value" th:object="${filter.filter}" id="account">
+			Счет:<select th:onchange="window.location = this.value" id="account">
 				<option selected disabled th:text="${disabledAccount}"></option>
-				<option th:value="@{/}+${type}+'?startDate='+*{startDate}+'&endDate='
-			+*{endDate}">Итого</option>
-				<option th:each="cashAccount : ${cashAccounts}" th:value="@{/}+${type}+'?startDate='+*{startDate}+
-			'&endDate='+*{endDate}+'&account='+${cashAccount.name}"
-					th:text="${cashAccount.name}" />
+				<option th:value="@{/main/{type}(type=${type},
+						dateRange.startDate=${#dates.format(filter.dateRange.startDate, 'yyyy-MM-dd')},
+						dateRange.endDate=${#dates.format(filter.dateRange.endDate, 'yyyy-MM-dd')})}">Итого</option>
+				<option th:each="cashAccount : ${cashAccounts}" th:value="@{/main/{type}(type=${type},
+					dateRange.startDate=${#dates.format(filter.dateRange.startDate, 'yyyy-MM-dd')},
+					dateRange.endDate=${#dates.format(filter.dateRange.endDate, 'yyyy-MM-dd')},
+					account=${cashAccount.name})}" th:text="${cashAccount.name}" />
 			</select>
 		</div>
 		<h2 th:text="'Баланс: '+${generalBalance}">General Balance</h2>
@@ -75,19 +82,29 @@
 		<input type="date" th:field="*{dateRange.endDate}" id="endDate">
 		<br>
 	</form>
-	<div th:if="${type.equals('income')}" th:object="${viewModel}">
-		<a th:href="@{/outcome?}+*{linkParameters}" class="button">Расходы</a>
-		<label class="pushedButton">Доходы</label>
-	</div>
-	<div th:if="${type.equals('outcome')}" th:object="${viewModel}">
-		<label class="pushedButton">Расходы</label>
-		<a th:href="@{/income?}+*{linkParameters}" class="button">Доходы</a>
-	</div>
-	<p th:each="category : ${predentedCategories.keySet()}">
-		<a th:href="@{/operations?}+${viewModel.linkParameters}+'&type='+*{viewModel.type}+'&categoryID='+${categoryID}"
-			class="category" th:text="${viewModel.predentedCategories.get(categoryID)}"></a>
-	</p>
-
+	<form th:method="GET" th:action="@{/main/{type} (type=${type.equals('outcome')?'income':'outcome'})}" th:object="${filter}">
+		<input type="hidden" th:field="*{account}"/>
+		<input type="hidden" th:field="*{dateRange.startDate}"/>
+		<input type="hidden" th:field="*{dateRange.endDate}"/>
+		<div th:if="${type.equals('income')}">
+			<input type="submit" class="button" value="Расходы"/>
+			<label class="pushedButton">Доходы</label>
+		</div>
+		<div th:if="${type.equals('outcome')}">
+			<label class="pushedButton">Расходы</label>
+			<input type="submit" class="button" value="Доходы"/>
+		</div>
+	</form>
+	
+	
+		<form th:method="GET" th:action="@{/operations/{type} (type=${type})}" th:object="${filter}" th:each="category : ${predentedCategories.keySet()}">
+			<input type="hidden" th:field="*{account}"/>
+			<input type="hidden" th:field="*{dateRange.startDate}"/>
+			<input type="hidden" th:field="*{dateRange.endDate}"/>
+			<input type="hidden" name="category" th:value="${category}"/>
+			<input type="submit" class="category" th:value="${predentedCategories.get(category)}"/>
+		</form>
+	
 </body>
 
 

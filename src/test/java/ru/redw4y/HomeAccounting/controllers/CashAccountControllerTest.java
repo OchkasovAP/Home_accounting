@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.minidev.json.JSONArray;
 import net.minidev.json.parser.JSONParser;
-import ru.ochkasovap.homeAccountingRest.dto.AccountDTO;
+import ru.redw4y.HomeAccounting.dto.AccountDTO;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -25,7 +25,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-
+/*
+ * TODO класс взят с REST версии. Необходимо переделать
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")

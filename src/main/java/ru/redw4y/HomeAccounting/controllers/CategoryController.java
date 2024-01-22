@@ -47,32 +47,29 @@ public class CategoryController extends AbstractHomeAccountingController{
 
 	@GetMapping("/{type}")
 	public String showCategories(@AuthenticationPrincipal UserDetailsImpl userDetails,
-			@PathVariable("type") String typeName, Model model) {
-		OperationType type = OperationType.getTypeFromName(typeName);
+			@PathVariable("type") OperationType type, Model model) {
 		List<CategoryDTO> categories = service.findAllByUser(userDetails.getUser().getId(), type)
 				.stream()
 				.map(this::convertCategory)
 				.toList();
 		model.addAttribute("categories",categories);
-		model.addAttribute("type", typeName);
+		model.addAttribute("type", type.name().toLowerCase());
 		return "/categories/showCategories";
 	}
 	
-	@GetMapping("/new/{type}")
-	public String createForm(@PathVariable("type") String type, @ModelAttribute("category") CategoryDTO category, Model model) {
-		type = type.equals("income")?type:"outcome";
-		model.addAttribute("type", type);
+	@GetMapping("/{type}/new")
+	public String createForm(@PathVariable("type") OperationType type, @ModelAttribute("category") CategoryDTO category, Model model) {
+		model.addAttribute("type", type.name().toLowerCase());
 		return "/categories/createForm";
 	}
 
 	@GetMapping("/{type}/{id}")
 	public String showCategoryInfo(@PathVariable("id") int id,
-			@PathVariable("type") String typeName, @AuthenticationPrincipal UserDetailsImpl userDetails, Model model) {
-		OperationType type = OperationType.getTypeFromName(typeName);
+			@PathVariable("type") OperationType type, @AuthenticationPrincipal UserDetailsImpl userDetails, Model model) {
 		try {
 			CategoryDTO category = convertCategory(service.findById(userDetails.getUser().getId(), id, type.getCategoryClass()));
 			model.addAttribute("category", category);
-			model.addAttribute("type", typeName);
+			model.addAttribute("type", type.name().toLowerCase());
 			return "/categories/singleInfo";
 		} catch (NullPointerException ex) {
 			throw new HomeAccountingException("Категории с таким id не существует");
@@ -80,44 +77,45 @@ public class CategoryController extends AbstractHomeAccountingController{
 	}
 
 	@PostMapping("/{type}")
-	public String addNewCategory(@AuthenticationPrincipal UserDetailsImpl userDetails,@PathVariable("type") String typeName,
-			@ModelAttribute("category") @Valid CategoryDTO categoryDTO, BindingResult bindingResult) {
-		Category category = convertDTO(categoryDTO, typeName);
+	public String addNewCategory(@AuthenticationPrincipal UserDetailsImpl userDetails,@PathVariable("type") OperationType type,
+			@ModelAttribute("category") @Valid CategoryDTO categoryDTO, BindingResult bindingResult, Model model) {
+		Category category = convertDTO(categoryDTO, type);
 		category.setUser(userDetails.getUser());
 		validator.validate(category, bindingResult);
 		if(bindingResult.hasErrors()) {
+			model.addAttribute("type", type.name().toLowerCase());
 			return "categories/createForm";
 		}
 		service.create(userDetails.getUser().getId(), category);
-		return "redirect:/categories/"+typeName;
+		return "redirect:/categories/"+type.name().toLowerCase();
 	}
 
 	@PatchMapping("/{type}")
-	public String editCategory(@ModelAttribute("category") @Valid CategoryDTO categoryDTO, BindingResult bindingResult, @PathVariable("type") String typeName, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-		Category category = convertDTO(categoryDTO, typeName);
+	public String editCategory(@ModelAttribute("category") @Valid CategoryDTO categoryDTO, BindingResult bindingResult, @PathVariable("type") OperationType type, @AuthenticationPrincipal UserDetailsImpl userDetails, Model model) {
+		Category category = convertDTO(categoryDTO, type);
 		category.setUser(userDetails.getUser());
 		validator.validate(category, bindingResult);
 		if(bindingResult.hasErrors()) {
+			model.addAttribute("type", type.name().toLowerCase());
 			return "/categories/singleInfo";					
 		}
 		service.edit(category);
-		return "redirect:/categories/"+typeName;
+		return "redirect:/categories/"+type.name().toLowerCase();
 	}
 
 	@DeleteMapping("/{type}/{id}")
-	public String deleteCategory(@PathVariable("id") int categoryID, @PathVariable("type") String typeName,
+	public String deleteCategory(@PathVariable("id") int categoryID, @PathVariable("type") OperationType type,
 			@AuthenticationPrincipal UserDetailsImpl userDetails) {
-		OperationType type = OperationType.getTypeFromName(typeName);
 		service.remove(userDetails.getUser().getId(), categoryID, type);
-		return "redirect:/categories/"+typeName;
+		return "redirect:/categories/"+type.name().toLowerCase();
 	}
 
 	private CategoryDTO convertCategory(Category category) {
 		return modelMapper.map(category, CategoryDTO.class);
 	}
 
-	private Category convertDTO(CategoryDTO categoryDTO, String typeName) {
-		Class<Category> categoryClass = OperationType.getTypeFromName(typeName).getCategoryClass();
+	private Category convertDTO(CategoryDTO categoryDTO, OperationType type) {
+		Class<Category> categoryClass = type.getCategoryClass();
 		return modelMapper.map(categoryDTO, categoryClass);
 	}
 }

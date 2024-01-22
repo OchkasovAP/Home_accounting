@@ -12,14 +12,14 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityManager;
 
 import ru.redw4y.HomeAccounting.util.exceptions.ForbiddenUsersActionException;
-import ru.redw4y.HomeAccounting.dto.DateRange;
 import ru.redw4y.HomeAccounting.models.CashAccount;
 import ru.redw4y.HomeAccounting.models.Income;
 import ru.redw4y.HomeAccounting.models.Outcome;
 import ru.redw4y.HomeAccounting.models.User;
 import ru.redw4y.HomeAccounting.util.Category;
-
+import ru.redw4y.HomeAccounting.util.DateRange;
 import ru.redw4y.HomeAccounting.util.Operation;
+import ru.redw4y.HomeAccounting.util.OperationFilter;
 import ru.redw4y.HomeAccounting.util.OperationType;
 
 @Service
@@ -97,12 +97,12 @@ public class OperationsService {
 	}
 	
 	@Transactional(readOnly = true)
-	public List<? extends Operation> findAll(Operation filterInstance, DateRange dateRange) {
-		return findAllByUser(filterInstance)
+	public List<? extends Operation> findAll(OperationFilter filter, int userId) {
+		return findAllByUser(filter, userId)
 				.stream()
-				.filter(o -> operationInDateInterval(dateRange, o)
-						&&operationIncludeCategory(filterInstance, o)
-						&&operationIncludeCashAccount(filterInstance, o))
+				.filter(o -> operationInDateInterval(filter.getDateRange(), o)
+						&&operationIncludeCategory(filter, o)
+						&&operationIncludeCashAccount(filter, o))
 				.sorted((o1, o2) -> {
 					int dateCompare = o1.getDate().compareTo(o2.getDate());
 					if (dateCompare != 0) {
@@ -113,11 +113,11 @@ public class OperationsService {
 				.toList();
 	}
 	
-	private List<? extends Operation> findAllByUser(Operation filterInstatnce) {
-		User user = userService.findById(filterInstatnce.getUser().getId());
-		if(OperationType.INCOME.equals(filterInstatnce.getType())) {
+	private List<? extends Operation> findAllByUser(OperationFilter filter, int userId) {
+		User user = userService.findById(userId);
+		if(OperationType.INCOME.equals(filter.getType())) {
 			return user.getIncomes(); 
-		} else if(OperationType.OUTCOME.equals(filterInstatnce.getType())) {
+		} else if(OperationType.OUTCOME.equals(filter.getType())) {
 			return user.getOutcomes();
 		}
 		throw new IllegalArgumentException("Non correct operation type");
@@ -156,15 +156,15 @@ public class OperationsService {
 		return operationDate.compareTo(dateRange.getStartDate()) >= 0
 				&& operationDate.compareTo(dateRange.getEndDate()) <= 0;
 	}
-	private boolean operationIncludeCategory(Operation filter, Operation comparedOperation) {
-		if (filter.getCategory()==null || filter.getCategory().getName()==null || comparedOperation.getCategory().getName().equals(filter.getCategory().getName())) {
+	private boolean operationIncludeCategory(OperationFilter filter, Operation comparedOperation) {
+		if (filter.getCategory().isBlank() || comparedOperation.getCategory().getName().equals(filter.getCategory())) {
 			return true;
 		}
 		return false;
 	}
 
-	private boolean operationIncludeCashAccount(Operation filter, Operation comparedOperation) {
-		if (filter.getCashAccount()==null||filter.getCashAccount().getName()==null||comparedOperation.getCashAccount().getName().equals(filter.getCashAccount().getName())) {
+	private boolean operationIncludeCashAccount(OperationFilter filter, Operation comparedOperation) {
+		if (filter.getAccount().isBlank()||comparedOperation.getCashAccount().getName().equals(filter.getAccount())) {
 			return true;
 		}
 		return false;

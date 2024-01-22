@@ -3,18 +3,19 @@ package ru.redw4y.HomeAccounting.services;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import ru.redw4y.HomeAccounting.dto.DateRange;
 import ru.redw4y.HomeAccounting.dto.MainViewDTO;
 import ru.redw4y.HomeAccounting.dto.OperationDTO;
-import ru.redw4y.HomeAccounting.dto.OperationFilter;
 import ru.redw4y.HomeAccounting.models.CashAccount;
 import ru.redw4y.HomeAccounting.models.User;
 import ru.redw4y.HomeAccounting.util.Category;
+import ru.redw4y.HomeAccounting.util.DateRange;
 import ru.redw4y.HomeAccounting.util.Operation;
+import ru.redw4y.HomeAccounting.util.OperationFilter;
 import ru.redw4y.HomeAccounting.util.OperationType;
 
 @Service
@@ -28,20 +29,25 @@ public class HomePageService {
 	private Map<String, Object> modelAttributes;
 	private double amountInPeriod;
 	
-	public Map<String, Object> mainPageAttributes(Operation filter, DateRange dateRange, User user) {
+	public Map<String, Object> mainPageAttributes(OperationFilter filter, User user) {
 		modelAttributes = new HashMap<>();
-		List<? extends Operation> operations = operationService.findAll(filter, dateRange);
+		List<? extends Operation> operations = operationService.findAll(filter, user.getId());
 		List<CashAccount> cashAccounts = accountService.findAllByUser(user.getId());
-		modelAttributes.put("predentedCategories", getPredentedCategories(operations));
-		if (filter.getCashAccount() != null) {
-			CashAccount cashAccount = accountService.findByNameAndUser(filter.getCashAccount().getName(), user).get();
-			recalculateGeneralBalance(cashAccount);
+		put("predentedCategories", getPredentedCategories(operations));
+		Optional<CashAccount> cashAccount = accountService.findByNameAndUser(filter.getAccount(), user);
+		if(cashAccount.isPresent()) {
+			recalculateGeneralBalance(cashAccount.get());
 		} else {
-			modelAttributes.put("generalBalance", accountService.getGeneralBalance(cashAccounts));
-			modelAttributes.put("disabledAccount", "Итого");
+			put("generalBalance", accountService.getGeneralBalance(cashAccounts));
+			put("disabledAccount", "Итого");
 		}
-		modelAttributes.put("cashAccounts", cashAccounts);
+		put("cashAccounts", cashAccounts);
+		put("type", filter.getType().name().toLowerCase());
 		return modelAttributes;
+	}
+	
+	private void put(String key, Object attribute) {
+		modelAttributes.put(key, attribute);
 	}
 	
 	private Map<String, String> getPredentedCategories(List<? extends Operation> operations) {
@@ -52,8 +58,8 @@ public class HomePageService {
 	}
 	
 	private void recalculateGeneralBalance(CashAccount cashAccount) {
-		modelAttributes.put("disabledAccount", cashAccount.getName());
-		modelAttributes.put("generalBalance", cashAccount.getBalance());
+		put("disabledAccount", cashAccount.getName());
+		put("generalBalance", cashAccount.getBalance());
 	}
 	
 	private void calculateAmoundCategories(List<? extends Operation> operations) {

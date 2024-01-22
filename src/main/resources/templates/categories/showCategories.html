@@ -2,7 +2,7 @@
 <html>
 
 <head>
-	<meta charset="UTF-8">
+	<meta charset="UTF-8"/>
 	<title>Categories</title>
 	<style>
 		.button {
@@ -50,19 +50,23 @@
 
 <body>
 	<div th:if="${type.equals('income')}">
-		<label class="pushedButton">Доходы</label>
-		<a th:href="@{/categories/outcome}" class="button">Расходы</a>
+		<label id="IncomeButton" class="pushedButton">Доходы</label>
+		<a id="OutcomeButton" th:href="@{/categories/outcome}" class="button">Расходы</a>
 	</div>
 	<div th:if="${type.equals('outcome')}">
-		<a th:href="@{/categories/income}" class="button">Доходы</a>
-		<label class="pushedButton">Расходы</label>
+		<a id="IncomeButton" th:href="@{/categories/income}" class="button">Доходы</a>
+		<label id="OutcomeButton" class="pushedButton">Расходы</label>
 	</div>
-	<div th:each="category : ${categories}">
-		<a th:href="@{/categories/}+${type}+'/'+${category.getId()}" th:text="${category.getName()}"
-			class="category">Category</a>
+	<hr/>
+	<div id="CategoriesList">
+		<div th:each="category : ${categories}">
+			<a th:id="${category.id}" th:href="@{/categories/{type}/{id} (type=${type},id=${category.id})}"
+				th:text="${category.name}" class="category">Category</a>
+		</div>
 	</div>
-	<a th:href="@{/categories/new/}+${type}" class="button">Создать категорию</a><br />
-	<a th:href="@{/menu}" class="button">Меню</a>
+	<hr/>
+	<a id="CreateButton" th:href="@{/categories/{type}/new (type=${type})}" class="button">Создать категорию</a><br />
+	<a id="MenuButton" th:href="@{/menu}" class="button">Меню</a>
 </body>
 
 </html>

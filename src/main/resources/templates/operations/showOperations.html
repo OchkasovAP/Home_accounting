@@ -25,12 +25,25 @@
 </head>
 
 <body>
-	<div th:text="${filter.dateRange}"></div>
+	<form th:method="GET" th:action="@{/operations/{type} (type=${type})}" th:object="${filter}">
+		<input type="hidden" th:field="*{account}"/>
+		<input type="hidden" th:field="*{category}"/>
+		<label for="startDate">Начало:</label>
+		<input type="date" th:field="*{dateRange.startDate}" id="startDate">
+		<label for="endDate">Конец:</label>
+		<input type="date" th:field="*{dateRange.endDate}" id="endDate">
+		<input type="submit" hidden><br>
+	</form>
+	<hr/>
 	<div th:each="operation : ${operations}">
 		<a th:href="@{/operations/}+${type}+'/'+${operation.getId()}"
 		th:text="${operation}" class="button"></a>
 	</div>
-	<a th:href="@{/}" class="button">Главная страница</a>
+	<hr/>
+	<a th:href="@{/operations/}+${type}+'/new'" class="button">+</a>
+	<br/>	
+	<a th:href="@{/main/{type}(type=${type}, dateRange.startDate=${#dates.format(filter.dateRange.startDate, 'yyyy-MM-dd')},
+		dateRange.endDate=${#dates.format(filter.dateRange.endDate, 'yyyy-MM-dd')}, account=${filter.account})}" class="button">Главная страница</a>
 </body>
 
 </html>

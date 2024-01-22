@@ -2,6 +2,12 @@ package ru.redw4y.HomeAccounting.controllers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
 
 import java.util.List;
 
@@ -22,7 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.minidev.json.JSONArray;
 import net.minidev.json.parser.JSONParser;
-import ru.ochkasovap.homeAccountingRest.dto.CategoryDTO;
+import ru.redw4y.HomeAccounting.dto.CategoryDTO;
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")
@@ -50,24 +56,23 @@ class CategoryControllerTest  {
 	
 	@Test
 	void showCategories_WithoutDetails() throws Exception {
-		mockMvc.perform(get("/categories/{type}", "income"))
-		.andExpect(status().isForbidden());
-		
-		mockMvc.perform(get("/categories/{type}", "outcome"))
-		.andExpect(status().isForbidden());
+		for(String type:types) {
+			mockMvc.perform(get("/categories/{type}", type))
+			.andExpect(status().isFound());
+		}
 	}
 	@Test
 	@WithUserDetails("user")
 	void showCategories_UserDetails() throws Exception{
-		CategoryDTO category1 = CategoryDTO.builder().id(1).name("TestCategory1").build();
-		CategoryDTO category2 = CategoryDTO.builder().id(2).name("TestCategory2").build();
-		String jsonCategories = objectMapper.writeValueAsString(List.of(category1, category2));
-		JSONParser jsonParser = new JSONParser(JSONParser.DEFAULT_PERMISSIVE_MODE);
-		JSONArray jsonArray = (JSONArray)jsonParser.parse(jsonCategories);
 		for(String type:types) {
 			mockMvc.perform(get("/categories/{type}", type))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$", Matchers.containsInAnyOrder(jsonArray.toArray())));
+			.andDo(print())
+			.andExpect(content().string(containsString("/categories/"+type+"/1")))
+			.andExpect(content().string(containsString("/categories/"+type+"/2")))
+			.andExpect(xpath("//div[@id='CategoriesList']/div").nodeCount(2))
+			.andExpect(xpath("//a[@id='1']").string("TestCategory1"))
+			.andExpect(xpath("//a[@id='2']").string("TestCategory2"));
 		}
 	}
 	

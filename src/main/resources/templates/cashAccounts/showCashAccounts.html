@@ -2,7 +2,7 @@
 <html>
 
 <head>
-	<meta charset="UTF-8">
+	<meta charset="UTF-8"/>
 	<title>Счета</title>
 	<style>
 		.button {
@@ -26,9 +26,11 @@
 <body>
 	<h1 th:text="'Общий баланс = '+${generalBalance}" />
 	<h2>Счета:</h2>
+	<hr/>
 	<div th:each="cashAccount : ${cashAccounts}">
 		<a th:href="@{cashAccounts/{id} (id=${cashAccount.getId()})}" th:text="${cashAccount}" class="button" />
 	</div>
+	<hr/>
 	<a th:href="@{cashAccounts/new}" class="button">+</a><br>
 	<a th:href="@{/menu}" class="button">Меню</a>
 </body>

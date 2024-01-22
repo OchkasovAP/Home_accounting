@@ -14,14 +14,6 @@ import static ru.redw4y.HomeAccounting.util.OperationType.*;
 class OperationTypeTest {
 
 	@Test
-	void getTypeFromName() {
-		for(String typeName:new String[] {"outcome","fmdjskgnfsjk",null}) {
-			assertEquals(OUTCOME, OperationType.getTypeFromName(typeName));
-		}
-		assertEquals(INCOME, OperationType.getTypeFromName("income"));
-	}
-	
-	@Test
 	void newEmptyOperation() {
 		assertEquals(Income.class, INCOME.newEmptyOperation().getClass());
 		assertEquals(Outcome.class, OUTCOME.newEmptyOperation().getClass());

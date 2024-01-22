@@ -12,14 +12,14 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
-import ru.ochkasovap.homeAccountingRest.dto.AuthenticationDTO;
-
+import ru.redw4y.HomeAccounting.dto.AuthenticationDTO;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-
+/*
+ * TODO класс взят с REST версии. Необходимо переделать
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")
